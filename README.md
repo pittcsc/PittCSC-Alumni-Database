@@ -11,13 +11,13 @@
 - **SMTP Email**
 
 ### Frontend
-- **React 18** - Modern React with hooks
-- **TypeScript** - Type-safe JavaScript
-- **Vite** - Fast build tool and development server
-- **Tailwind CSS** - Utility-first CSS framework
-- **Zustand** - Lightweight state management
-- **Lucide React** - Beautiful, customizable icons
-- **Axios** - HTTP client for API calls
+- **React 18**
+- **TypeScript**
+- **Vite**
+- **Tailwind CSS**
+- **Zustand**
+- **Lucide React**
+- **Axios**
 
 ## Prerequisites
 
