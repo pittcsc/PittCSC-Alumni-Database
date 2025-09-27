@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Users, Briefcase, Network, Sparkles, ChevronDown } from 'lucide-react';
+import { ArrowRight, Sparkles, ChevronDown } from 'lucide-react';
 
 const Hero: React.FC = () => {
   return (
@@ -69,18 +69,5 @@ const Hero: React.FC = () => {
   );
 };
 
-const StatCard: React.FC<{
-  icon: React.ReactNode;
-  value: string;
-  label: string;
-}> = ({ icon, value, label }) => (
-  <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10 hover:bg-white/10 transition-colors">
-    <div className="flex justify-center text-pittGold mb-3">
-      {React.cloneElement(icon as React.ReactElement, { className: 'h-8 w-8' })}
-    </div>
-    <div className="text-3xl font-bold text-white mb-1">{value}</div>
-    <div className="text-sm text-gray-400">{label}</div>
-  </div>
-);
 
 export default Hero;

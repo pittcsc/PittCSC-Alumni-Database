@@ -43,13 +43,6 @@ def login_access_token(
     )
 
 
-@router.post("/login/test-token", response_model=UserPublic)
-def test_token(current_user: CurrentUser) -> Any:
-    """
-    Test access token
-    """
-    return current_user
-
 
 @router.post("/password-recovery/{email}")
 def recover_password(email: str, session: SessionDep) -> Message:

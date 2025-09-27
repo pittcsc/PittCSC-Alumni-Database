@@ -12,7 +12,6 @@ import {
   ChevronDown
 } from 'lucide-react';
 import { AlumniFilters as FiltersType } from '../../types';
-import Button from '../ui/Button';
 
 interface AlumniFiltersProps {
   filters: FiltersType;
@@ -45,9 +44,9 @@ const AlumniFilters: React.FC<AlumniFiltersProps> = ({
     }, 300);
 
     return () => clearTimeout(debounceTimer);
-  }, [searchTerm]);
+  }, [searchTerm, filters.search, onSearch]);
 
-  const handleFilterChange = (key: keyof FiltersType, value: any) => {
+  const handleFilterChange = (key: keyof FiltersType, value: string | number | boolean | undefined) => {
     const newFilters = { ...localFilters, [key]: value };
     setLocalFilters(newFilters);
     onFiltersChange(newFilters);

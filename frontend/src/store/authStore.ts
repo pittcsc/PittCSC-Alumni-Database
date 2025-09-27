@@ -37,10 +37,13 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       await get().fetchCurrentUser();
       
       set({ isAuthenticated: true });
-    } catch (error: any) {
-      set({ 
-        error: error.response?.data?.detail || 'Login failed',
-        isAuthenticated: false 
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error && 'response' in error
+        ? (error as any).response?.data?.detail || 'Login failed'
+        : 'Login failed';
+      set({
+        error: errorMessage,
+        isAuthenticated: false
       });
       throw error;
     } finally {
@@ -56,9 +59,12 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       
       // Auto-login after registration
       await get().login(email, password);
-    } catch (error: any) {
-      set({ 
-        error: error.response?.data?.detail || 'Registration failed' 
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error && 'response' in error
+        ? (error as any).response?.data?.detail || 'Registration failed'
+        : 'Registration failed';
+      set({
+        error: errorMessage
       });
       throw error;
     } finally {
@@ -77,8 +83,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         accessToken: null,
         isAuthenticated: false 
       });
-    } catch (error: any) {
-      set({ error: error.response?.data?.detail || 'Logout failed' });
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error && 'response' in error
+        ? (error as any).response?.data?.detail || 'Logout failed'
+        : 'Logout failed';
+      set({ error: errorMessage });
     } finally {
       set({ isLoading: false });
     }

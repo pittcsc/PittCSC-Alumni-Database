@@ -54,10 +54,13 @@ class Settings(BaseSettings):
     PROJECT_NAME: str = "Pitt CSC DB"
     SENTRY_DSN: HttpUrl | None = None
     SQLITE_DB: str = "sqlite:///./alumni.db"
+    DATABASE_URL: str | None = os.getenv('DATABASE_URL')
 
     @computed_field  # type: ignore[prop-decorator]
     @property
     def SQLALCHEMY_DATABASE_URI(self) -> str:
+        if self.DATABASE_URL and self.ENVIRONMENT != "local":
+            return self.DATABASE_URL
         return self.SQLITE_DB
 
     SMTP_TLS: bool = True
@@ -82,7 +85,6 @@ class Settings(BaseSettings):
     def emails_enabled(self) -> bool:
         return bool(self.SMTP_HOST and self.EMAILS_FROM_EMAIL)
 
-    EMAIL_TEST_USER: EmailStr = "test@example.com"
     FIRST_SUPERUSER: EmailStr = os.getenv('FIRST_SUPERUSER')
     FIRST_SUPERUSER_PASSWORD: str = os.getenv('FIRST_SUPERUSER_PASSWORD')
     FIRST_SUPERUSER_NAME: str = os.getenv('FIRST_SUPERUSER_NAME')

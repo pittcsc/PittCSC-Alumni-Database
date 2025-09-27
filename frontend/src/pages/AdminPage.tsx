@@ -2,12 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { useAdminStore } from '../store/adminStore';
-import { Users, UserCheck, UserX, BarChart2, Settings } from 'lucide-react';
+import { Users, UserCheck, BarChart2, Settings } from 'lucide-react';
 import Button from '../components/Button';
 import Card, { CardHeader, CardBody } from '../components/Card';
 
 const AdminPage: React.FC = () => {
-  const { user, profile } = useAuthStore();
+  const { user } = useAuthStore();
   const {
     users,
     pendingAlumni,
@@ -30,7 +30,7 @@ const AdminPage: React.FC = () => {
       return;
     }
     
-    if (!profile?.is_admin) {
+    if (!user?.is_superuser) {
       navigate('/');
       return;
     }
@@ -42,7 +42,7 @@ const AdminPage: React.FC = () => {
     } else if (activeTab === 'pending') {
       fetchPendingAlumni();
     }
-  }, [user, profile, navigate, activeTab, fetchAnalytics, fetchUsers, fetchPendingAlumni]);
+  }, [user, navigate, activeTab, fetchAnalytics, fetchUsers, fetchPendingAlumni]);
   
   const handleApproveAlumni = async (userId: string) => {
     await approveAlumni(userId);

@@ -1,4 +1,5 @@
 import axios, { AxiosInstance, AxiosError } from 'axios';
+import { UserUpdate, Interview, Employment, ConnectionRequest } from '../types';
 
 // API base URL - should match your FastAPI backend
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
@@ -77,7 +78,7 @@ export const authAPI = {
     return response.data;
   },
 
-  async updateProfile(data: any) {
+  async updateProfile(data: UserUpdate) {
     const response = await api.patch('/users/me', data);
     return response.data;
   },
@@ -105,7 +106,7 @@ export const userAPI = {
     return response.data;
   },
 
-  async updateUser(userId: number, data: any) {
+  async updateUser(userId: number, data: UserUpdate) {
     const response = await api.patch(`/users/${userId}`, data);
     return response.data;
   },
@@ -193,12 +194,12 @@ export const interviewAPI = {
     return response.data;
   },
 
-  async createInterview(data: any) {
+  async createInterview(data: Omit<Interview, 'id'>) {
     const response = await api.post('/interviews/', data);
     return response.data;
   },
 
-  async createBulkInterviews(data: any[]) {
+  async createBulkInterviews(data: Omit<Interview, 'id'>[]) {
     const response = await api.post('/interviews/bulk', data);
     return response.data;
   },
@@ -216,7 +217,7 @@ export const employmentAPI = {
     return response.data;
   },
 
-  async createEmployment(data: any) {
+  async createEmployment(data: Omit<Employment, 'id'>) {
     const response = await api.post('/employment/', data);
     return response.data;
   },
@@ -234,12 +235,12 @@ export const requestAPI = {
     return response.data;
   },
 
-  async createRequest(data: any) {
+  async createRequest(data: Omit<ConnectionRequest, 'id' | 'created_at' | 'updated_at'>) {
     const response = await api.post('/requests/', data);
     return response.data;
   },
 
-  async updateRequest(requestId: number, data: any) {
+  async updateRequest(requestId: number, data: Partial<ConnectionRequest>) {
     const response = await api.patch(`/requests/${requestId}`, data);
     return response.data;
   },
