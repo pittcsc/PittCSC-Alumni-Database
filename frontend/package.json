@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "build:netlify": "npm run build && cp ../netlify.toml dist/ && cp ../_redirects dist/"
   },
   "dependencies": {
     "@fontsource/inter": "^5.2.6",
