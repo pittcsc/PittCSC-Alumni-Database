@@ -1,4 +1,4 @@
-version: '3.8'
+version: '1.0'
 
 services:
   backend:
@@ -11,6 +11,7 @@ services:
       - ENVIRONMENT=production
       - SECRET_KEY=${SECRET_KEY}
       - FRONTEND_HOST=${FRONTEND_HOST}
+      - BACKEND_CORS_ORIGINS=http://localhost,http://localhost:80,http://frontend,http://frontend:80
       - FIRST_SUPERUSER=${FIRST_SUPERUSER}
       - FIRST_SUPERUSER_PASSWORD=${FIRST_SUPERUSER_PASSWORD}
       - FIRST_SUPERUSER_NAME=${FIRST_SUPERUSER_NAME}
@@ -20,8 +21,6 @@ services:
       - EMAILS_FROM_EMAIL=${EMAILS_FROM_EMAIL}
     volumes:
       - ./data:/app/data
-    depends_on:
-      - database
     restart: unless-stopped
 
   frontend:
@@ -37,19 +36,3 @@ services:
     depends_on:
       - backend
     restart: unless-stopped
-
-  database:
-    image: postgres:15-alpine
-    environment:
-      - POSTGRES_DB=${POSTGRES_DB}
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
-    ports:
-      - "5432:5432"
-    restart: unless-stopped
-
-volumes:
-  postgres_data:
