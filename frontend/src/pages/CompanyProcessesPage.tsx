@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Briefcase, CheckCircle, XCircle, ChevronDown, ChevronUp, Plus, Edit } from 'lucide-react';
+import { Search, Briefcase, CheckCircle, XCircle, ChevronDown, ChevronUp, Plus, Edit, AlertCircle } from 'lucide-react';
 import Button from '../components/Button';
 import Card, { CardHeader, CardBody, CardFooter } from '../components/Card';
 import Input from '../components/Input';
+import { interviewAPI, companyAPI } from '../services/api';
+import { Interview } from '../types';
 
 interface CompanyProcess {
   id: string;
@@ -50,259 +52,73 @@ const CompanyProcessesPage: React.FC = () => {
   });
 
   useEffect(() => {
-    // Simulate loading data
-    setIsLoading(true);
-    
-    // Mock data for company interview processes
-    const mockCompanies: CompanyProcess[] = [
-      {
-        id: '1',
-        company: 'Google',
-        logo: 'https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png',
-        positions: [
-          {
-            title: 'Software Engineer',
-            interviews: [
-              {
-                round: 'Phone Screen',
-                description: 'A 45-minute technical interview with a Google engineer, focusing on data structures and algorithms.',
-                tips: [
-                  'Practice coding on a whiteboard or Google Doc',
-                  'Review basic data structures (arrays, linked lists, trees, graphs)',
-                  'Be prepared to discuss time and space complexity'
-                ],
-                difficulty: 'Medium'
-              },
-              {
-                round: 'Onsite - Coding',
-                description: '4-5 interviews, each 45 minutes long, focusing on coding, algorithms, and system design.',
-                tips: [
-                  'Practice LeetCode medium/hard problems',
-                  'Be vocal about your thought process',
-                  'Ask clarifying questions before diving into solutions'
-                ],
-                difficulty: 'Hard'
-              },
-              {
-                round: 'Onsite - System Design',
-                description: 'Design a scalable system architecture for a given problem.',
-                tips: [
-                  'Understand distributed systems concepts',
-                  'Practice designing real-world systems (e.g., URL shortener, social media feed)',
-                  'Consider scalability, reliability, and performance'
-                ],
-                difficulty: 'Hard'
-              }
-            ]
-          },
-          {
-            title: 'Product Manager',
-            interviews: [
-              {
-                round: 'Phone Screen',
-                description: 'A 30-minute interview focusing on your background and product sense.',
-                tips: [
-                  'Prepare your "tell me about yourself" story',
-                  'Have examples of products you admire and why',
-                  'Be ready to discuss product metrics'
-                ],
-                difficulty: 'Medium'
-              },
-              {
-                round: 'Onsite - Product Case',
-                description: 'Design a product solution for a given problem.',
-                tips: [
-                  'Structure your approach: problem definition, user needs, solutions, metrics',
-                  'Consider business goals and technical feasibility',
-                  'Be prepared to defend your decisions'
-                ],
-                difficulty: 'Hard'
-              }
-            ]
+    const fetchInterviewData = async () => {
+      setIsLoading(true);
+
+      try {
+        // Fetch real interview data from API
+        const interviews: Interview[] = await interviewAPI.getInterviews();
+
+        // Group interviews by company
+        const companyMap = new Map<string, CompanyProcess>();
+
+        interviews.forEach((interview) => {
+          const companyName = interview.company_name;
+
+          if (!companyMap.has(companyName)) {
+            companyMap.set(companyName, {
+              id: companyName,
+              company: companyName,
+              logo: `https://logo.clearbit.com/${companyName.toLowerCase().replace(/\s+/g, '')}.com`,
+              positions: [],
+              isExpanded: false
+            });
           }
-        ],
-        isExpanded: false
-      },
-      {
-        id: '2',
-        company: 'Microsoft',
-        logo: 'https://img-prod-cms-rt-microsoft-com.akamaized.net/cms/api/am/imageFileData/RE1Mu3b?ver=5c31',
-        positions: [
-          {
-            title: 'Software Engineer',
-            interviews: [
-              {
-                round: 'Phone Screen',
-                description: 'A 30-minute technical interview focusing on coding and problem-solving.',
-                tips: [
-                  'Review basic algorithms and data structures',
-                  'Practice coding in your preferred language',
-                  'Be prepared to explain your approach'
-                ],
-                difficulty: 'Medium'
-              },
-              {
-                round: 'Onsite - Technical',
-                description: '4 interviews, each 45-60 minutes, covering coding, system design, and behavioral questions.',
-                tips: [
-                  'Practice coding on a whiteboard',
-                  'Review object-oriented design principles',
-                  'Prepare examples of past projects and challenges'
-                ],
-                difficulty: 'Medium'
-              }
-            ]
+
+          const company = companyMap.get(companyName)!;
+
+          // Find or create position
+          let position = company.positions.find(p => p.title === interview.role);
+          if (!position) {
+            position = {
+              title: interview.role,
+              interviews: []
+            };
+            company.positions.push(position);
           }
-        ],
-        isExpanded: false
-      },
-      {
-        id: '3',
-        company: 'Amazon',
-        logo: 'https://logos-world.net/wp-content/uploads/2020/04/Amazon-Logo.png',
-        positions: [
-          {
-            title: 'Software Development Engineer',
-            interviews: [
-              {
-                round: 'Online Assessment',
-                description: 'Coding assessment with 1-2 algorithmic problems to solve within a time limit.',
-                tips: [
-                  'Practice timed coding challenges',
-                  'Focus on efficiency and correctness',
-                  'Test your solution with multiple test cases'
-                ],
-                difficulty: 'Medium'
-              },
-              {
-                round: 'Phone Screen',
-                description: 'A 45-minute technical interview with coding and behavioral questions.',
-                tips: [
-                  'Be prepared to code in a shared document',
-                  "Review Amazon's leadership principles",
-                  'Have STAR method examples ready'
-                ],
-                difficulty: 'Medium'
-              },
-              {
-                round: 'Onsite - Loop',
-                description: "4-5 interviews focusing on coding, system design, and behavioral questions based on Amazon's leadership principles.",
-                tips: [
-                  "Study Amazon's leadership principles thoroughly",
-                  'Prepare specific examples for each principle',
-                  'Practice system design for scalable services'
-                ],
-                difficulty: 'Hard'
-              }
-            ]
-          }
-        ],
-        isExpanded: false
-      },
-      {
-        id: '4',
-        company: 'Apple',
-        logo: 'https://www.apple.com/ac/globalnav/7/en_US/images/be15095f-5a20-57d0-ad14-cf4c638e223a/globalnav_apple_image__b5er5ngrzxqq_large.svg',
-        positions: [
-          {
-            title: 'Software Engineer',
-            interviews: [
-              {
-                round: 'Phone Screen',
-                description: 'Technical discussion about your background and basic technical questions.',
-                tips: [
-                  'Review your resume and be prepared to discuss all projects in detail',
-                  'Research the specific team you are applying for',
-                  'Be ready to discuss Apple products you use'
-                ],
-                difficulty: 'Medium'
-              },
-              {
-                round: 'Technical Phone Interview',
-                description: 'Coding and problem-solving questions related to the role.',
-                tips: [
-                  'Practice coding problems',
-                  'Be familiar with the technologies mentioned in the job description',
-                  'Prepare questions about the team and role'
-                ],
-                difficulty: 'Medium'
-              },
-              {
-                round: 'Onsite',
-                description: '5-6 interviews with team members, focusing on technical skills, problem-solving, and cultural fit.',
-                tips: [
-                  'Be prepared for whiteboard coding',
-                  'Expect questions about your approach to problem-solving',
-                  'Show passion for Apple products and mission'
-                ],
-                difficulty: 'Hard'
-              }
-            ]
-          }
-        ],
-        isExpanded: false
-      },
-      {
-        id: '5',
-        company: 'Meta',
-        logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Meta_Platforms_Inc._logo.svg/1280px-Meta_Platforms_Inc._logo.svg.png',
-        positions: [
-          {
-            title: 'Software Engineer',
-            interviews: [
-              {
-                round: 'Initial Screen',
-                description: 'A 45-minute technical interview focusing on coding and problem-solving.',
-                tips: [
-                  'Practice coding problems on LeetCode',
-                  'Be comfortable with algorithms and data structures',
-                  'Explain your thought process clearly'
-                ],
-                difficulty: 'Medium'
-              },
-              {
-                round: 'Onsite - Coding',
-                description: '2 coding interviews, each 45 minutes, focusing on algorithms and data structures.',
-                tips: [
-                  'Practice medium to hard LeetCode problems',
-                  'Be prepared to optimize your solutions',
-                  'Consider edge cases in your solutions'
-                ],
-                difficulty: 'Hard'
-              },
-              {
-                round: 'Onsite - System Design',
-                description: 'Design a scalable system for a given problem.',
-                tips: [
-                  'Study distributed systems concepts',
-                  'Understand Meta scale challenges',
-                  'Practice designing social media features'
-                ],
-                difficulty: 'Hard'
-              },
-              {
-                round: 'Onsite - Behavioral',
-                description: 'Questions about your past experiences and how you handle various situations.',
-                tips: [
-                  'Prepare examples using the STAR method',
-                  'Research Meta values and culture',
-                  'Have questions ready about the team and role'
-                ],
-                difficulty: 'Medium'
-              }
-            ]
-          }
-        ],
-        isExpanded: false
+
+          // Add interview round
+          position.interviews.push({
+            round: interview.round ? `Round ${interview.round}` : interview.season,
+            description: interview.overview || 'No description provided',
+            tips: interview.tips ? [interview.tips] : [],
+            difficulty: interview.passed ? 'Medium' : 'Hard'
+          });
+        });
+
+        const companiesData = Array.from(companyMap.values());
+
+        if (companiesData.length === 0) {
+          // If no real data, show empty state instead of mock data
+          setCompanies([]);
+          setFilteredCompanies([]);
+        } else {
+          setCompanies(companiesData);
+          setFilteredCompanies(companiesData);
+        }
+      } catch (error) {
+        console.error('Error fetching interview data:', error);
+        // Show empty state on error instead of mock data
+        setCompanies([]);
+        setFilteredCompanies([]);
+      } finally {
+        setIsLoading(false);
       }
-    ];
-    
-    setTimeout(() => {
-      setCompanies(mockCompanies);
-      setFilteredCompanies(mockCompanies);
-      setIsLoading(false);
-    }, 1000);
+    };
+
+    fetchInterviewData();
   }, []);
+
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -750,19 +566,34 @@ const CompanyProcessesPage: React.FC = () => {
           </div>
         ) : filteredCompanies.length === 0 ? (
           <div className="bg-white rounded-lg shadow-md p-8 text-center">
-            <h3 className="text-xl font-semibold text-pittDeepNavy mb-2">No companies found</h3>
+            <AlertCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-pittDeepNavy mb-2">
+              {searchTerm ? 'No companies found' : 'No interview data available'}
+            </h3>
             <p className="text-gray-600 mb-4">
-              No companies match your search criteria. Try a different search term.
+              {searchTerm
+                ? 'No companies match your search criteria. Try a different search term.'
+                : 'No interview experiences have been shared yet. Be the first to contribute!'}
             </p>
-            <Button
-              variant="outline"
-              onClick={() => {
-                setSearchTerm('');
-                setFilteredCompanies(companies);
-              }}
-            >
-              Clear Search
-            </Button>
+            {searchTerm ? (
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setSearchTerm('');
+                  setFilteredCompanies(companies);
+                }}
+              >
+                Clear Search
+              </Button>
+            ) : (
+              <Button
+                variant="primary"
+                onClick={() => setShowAddForm(true)}
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Share Interview Experience
+              </Button>
+            )}
           </div>
         ) : (
           <div className="space-y-6">

@@ -23,23 +23,12 @@ interface AlumniCardProps {
 }
 
 const AlumniCard: React.FC<AlumniCardProps> = ({ alumnus, onRequestConnection }) => {
-  // Default profile images based on ID for mock data
+  // Get profile image or use placeholder
   const getProfileImage = () => {
     if (alumnus.profile_image) return alumnus.profile_image;
-    
-    // Mock profile images from Unsplash
-    const mockImages = [
-      'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=crop&w=256&q=80',
-      'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&auto=format&fit=crop&w=256&q=80',
-      'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-1.2.1&auto=format&fit=crop&w=256&q=80',
-      'https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-1.2.1&auto=format&fit=crop&w=256&q=80',
-      'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&auto=format&fit=crop&w=256&q=80',
-      'https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-1.2.1&auto=format&fit=crop&w=256&q=80'
-    ];
-    
-    // Use ID to consistently get the same image for the same alumni
-    const index = parseInt(alumnus.id) % mockImages.length;
-    return mockImages[index];
+
+    // Use a simple placeholder with initials
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(alumnus.full_name)}&background=003594&color=fff&size=256`;
   };
 
   return (

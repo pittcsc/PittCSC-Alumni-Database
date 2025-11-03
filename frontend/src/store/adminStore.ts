@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { supabase } from '../lib/supabase';
+import { userAPI } from '../services/api';
 
 interface AdminState {
   users: any[];
@@ -15,13 +15,13 @@ interface AdminState {
   fetchUsers: () => Promise<void>;
   fetchPendingAlumni: () => Promise<void>;
   fetchAnalytics: () => Promise<void>;
-  approveAlumni: (userId: string) => Promise<void>;
-  rejectAlumni: (userId: string) => Promise<void>;
-  updateUserRole: (userId: string, isAdmin: boolean) => Promise<void>;
+  approveAlumni: (userId: number) => Promise<void>;
+  rejectAlumni: (userId: number) => Promise<void>;
+  updateUserRole: (userId: number, isAdmin: boolean) => Promise<void>;
   clearError: () => void;
 }
 
-export const useAdminStore = create<AdminState>((set) => ({
+export const useAdminStore = create<AdminState>((set, get) => ({
   users: [],
   pendingAlumni: [],
   analytics: {
@@ -32,147 +32,115 @@ export const useAdminStore = create<AdminState>((set) => ({
   },
   isLoading: false,
   error: null,
-  
+
   fetchUsers: async () => {
     try {
       set({ isLoading: true, error: null });
-      
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*');
-      
-      if (error) throw error;
-      
-      set({ users: data || [] });
+
+      const response = await userAPI.getUsers();
+      set({ users: response.data || [] });
     } catch (error: any) {
-      set({ error: error.message });
+      set({ error: error.response?.data?.detail || error.message });
     } finally {
       set({ isLoading: false });
     }
   },
-  
+
   fetchPendingAlumni: async () => {
     try {
       set({ isLoading: true, error: null });
-      
+
       // Fetch users who have requested alumni status but haven't been approved
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('is_alumni', false)
-        .eq('profile_completed', true);
-      
-      if (error) throw error;
-      
-      set({ pendingAlumni: data || [] });
+      const response = await userAPI.getUsers();
+      const pendingAlumni = response.data?.filter(
+        (user: any) => !user.is_alumni && user.profile_completed
+      ) || [];
+
+      set({ pendingAlumni });
     } catch (error: any) {
-      set({ error: error.message });
+      set({ error: error.response?.data?.detail || error.message });
     } finally {
       set({ isLoading: false });
     }
   },
-  
+
   fetchAnalytics: async () => {
     try {
       set({ isLoading: true, error: null });
-      
-      // Get total users
-      const { data: users, error: usersError } = await supabase
-        .from('profiles')
-        .select('id');
-      
-      if (usersError) throw usersError;
-      
-      // Get total alumni
-      const { data: alumni, error: alumniError } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('is_alumni', true);
-      
-      if (alumniError) throw alumniError;
-      
-      // Get total connections
-      const { data: connections, error: connectionsError } = await supabase
-        .from('connection_requests')
-        .select('id, status');
-      
-      if (connectionsError) throw connectionsError;
-      
-      // Calculate acceptance rate
-      const acceptedConnections = connections?.filter(c => c.status === 'accepted').length || 0;
-      const totalConnections = connections?.length || 0;
-      const acceptanceRate = totalConnections > 0 ? (acceptedConnections / totalConnections) * 100 : 0;
-      
+
+      // Get all users
+      const usersResponse = await userAPI.getUsers();
+      const users = usersResponse.data || [];
+
+      // Calculate analytics
+      const totalUsers = users.length;
+      const totalAlumni = users.filter((u: any) => u.is_alumni).length;
+
+      // Note: Connection counts would need proper API endpoints
+      // For now, setting to 0 as a placeholder
+      const totalConnections = 0;
+      const acceptanceRate = 0;
+
       set({
         analytics: {
-          totalUsers: users?.length || 0,
-          totalAlumni: alumni?.length || 0,
-          totalConnections: totalConnections,
-          acceptanceRate: acceptanceRate,
+          totalUsers,
+          totalAlumni,
+          totalConnections,
+          acceptanceRate,
         },
       });
     } catch (error: any) {
-      set({ error: error.message });
+      set({ error: error.response?.data?.detail || error.message });
     } finally {
       set({ isLoading: false });
     }
   },
-  
-  approveAlumni: async (userId: string) => {
+
+  approveAlumni: async (userId: number) => {
     try {
       set({ isLoading: true, error: null });
-      
-      const { error } = await supabase
-        .from('profiles')
-        .update({ is_alumni: true })
-        .eq('id', userId);
-      
-      if (error) throw error;
-      
+
+      await userAPI.updateUser(userId, { is_alumni: true });
+
       // Refresh pending alumni list
-      await set.getState().fetchPendingAlumni();
+      await get().fetchPendingAlumni();
     } catch (error: any) {
-      set({ error: error.message });
+      set({ error: error.response?.data?.detail || error.message });
     } finally {
       set({ isLoading: false });
     }
   },
-  
-  rejectAlumni: async (userId: string) => {
+
+  rejectAlumni: async (userId: number) => {
     try {
       set({ isLoading: true, error: null });
-      
+
       // We don't delete the user, just keep them as a non-alumni
       // This could be enhanced with a "rejected" status if needed
-      
+
       // Refresh pending alumni list
-      await set.getState().fetchPendingAlumni();
+      await get().fetchPendingAlumni();
     } catch (error: any) {
-      set({ error: error.message });
+      set({ error: error.response?.data?.detail || error.message });
     } finally {
       set({ isLoading: false });
     }
   },
-  
-  updateUserRole: async (userId: string, isAdmin: boolean) => {
+
+  updateUserRole: async (userId: number, isAdmin: boolean) => {
     try {
       set({ isLoading: true, error: null });
-      
-      const { error } = await supabase
-        .from('profiles')
-        .update({ is_admin: isAdmin })
-        .eq('id', userId);
-      
-      if (error) throw error;
-      
+
+      await userAPI.updateUser(userId, { is_superuser: isAdmin });
+
       // Refresh users list
-      await set.getState().fetchUsers();
+      await get().fetchUsers();
     } catch (error: any) {
-      set({ error: error.message });
+      set({ error: error.response?.data?.detail || error.message });
     } finally {
       set({ isLoading: false });
     }
   },
-  
+
   clearError: () => set({ error: null }),
 }));
