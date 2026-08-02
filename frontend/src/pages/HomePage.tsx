@@ -9,6 +9,9 @@ import Hero from '../components/home/Hero';
 const COMPANIES = [
   'Anthropic', 'Character.AI', 'Google', 'Netflix', 'Roblox', 'AWS',
   'Plaid', 'Descope', 'NVIDIA', 'Amazon', 'Meta', 'Scale AI',
+  'Microsoft', 'Coinbase', 'Lockheed Martin', 'PNC', 'Capital One', 'Vanguard',
+  'BNY', 'Wabtec', 'Aurora', 'Eaton', 'Ansys', 'Numo',
+  'NFL', "Dick's Sporting Goods",
 ];
 
 const initials = (name: string | null) =>
