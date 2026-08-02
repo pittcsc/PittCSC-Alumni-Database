@@ -81,7 +81,7 @@ ALUMNI = [
     },
     {
         "email": "nij.patel@pitt.edu", "full_name": "Nij Patel",
-        "profile": dict(location="New York, NY", graduation_year=2024,
+        "profile": dict(location="San Francisco, CA", graduation_year=2024,
             current_company="Fragile", current_role="Engineer",
             open_to_coffee_chats=True, available_for_referrals=True),
         "company": "Fragile", "since": 2024,
@@ -102,14 +102,14 @@ ALUMNI = [
     },
     {
         "email": "rachel.jan@pitt.edu", "full_name": "Rachel Jan",
-        "profile": dict(location="New York, NY", graduation_year=2025,
+        "profile": dict(location="San Francisco, CA", graduation_year=2025,
             current_company="Plaid", current_role="Software Engineer",
             open_to_coffee_chats=True, available_for_referrals=True, open_to_resume_review=True),
         "company": "Plaid", "since": 2023,
     },
     {
         "email": "delaney.scheidell@pitt.edu", "full_name": "Delaney Scheidell",
-        "profile": dict(location="Seattle, WA", graduation_year=2025,
+        "profile": dict(location="Washington, DC", graduation_year=2025,
             current_company="AWS", current_role="Frontend Engineer",
             open_to_coffee_chats=True, open_to_resume_review=True),
         "company": "AWS", "since": 2024,

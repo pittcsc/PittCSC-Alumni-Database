@@ -8,7 +8,7 @@ import Hero from '../components/home/Hero';
 // Real employers from the directory — shown as evidence, not decoration.
 const COMPANIES = [
   'Anthropic', 'Character.AI', 'Google', 'Netflix', 'Roblox', 'AWS',
-  'Plaid', 'Descope', 'Sol Browser', 'Fragile', 'University of Maryland', 'Harvard',
+  'Plaid', 'Descope', 'NVIDIA', 'Amazon', 'Meta', 'Scale AI',
 ];
 
 const initials = (name: string | null) =>
