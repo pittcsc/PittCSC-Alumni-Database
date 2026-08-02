@@ -1,38 +1,27 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { 
-  GraduationCap, 
-  Menu, 
-  X, 
-  Briefcase, 
-  Users, 
+import {
+  GraduationCap,
+  Menu,
+  X,
+  Briefcase,
+  Users,
   User,
   LogOut,
-  Home,
   ChevronDown
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 
 const Navbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
-  
+
   const location = useLocation();
   const navigate = useNavigate();
   const { user, isAuthenticated, logout } = useAuthStore();
-  
+
   const isLoggedIn = isAuthenticated;
   const isAdmin = user?.is_superuser;
-
-  // Handle scroll effect
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   const handleSignOut = async () => {
     await logout();

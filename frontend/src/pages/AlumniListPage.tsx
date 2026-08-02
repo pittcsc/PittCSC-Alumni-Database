@@ -9,7 +9,7 @@ import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 
 const AlumniListPage: React.FC = () => {
-  const { user, isAuthenticated } = useAuthStore();
+  const { isAuthenticated } = useAuthStore();
   const { 
     alumni, 
     filteredAlumni, 
@@ -28,9 +28,7 @@ const AlumniListPage: React.FC = () => {
   
   const navigate = useNavigate();
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [showConnectionModal, setShowConnectionModal] = useState(false);
-  const [selectedAlumniId, setSelectedAlumniId] = useState<number | null>(null);
-  
+
   // Compute unique values for filters
   const filterOptions = useMemo(() => {
     const locations = new Set<string>();
@@ -73,8 +71,8 @@ const AlumniListPage: React.FC = () => {
       navigate('/login');
       return;
     }
-    setSelectedAlumniId(alumniId);
-    setShowConnectionModal(true);
+    // Connection requests are sent from the alumni detail page.
+    navigate(`/alumni/${alumniId}`);
   };
   
   const handlePageChange = (page: number) => {

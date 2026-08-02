@@ -15,6 +15,7 @@ export interface User {
   open_to_coffee_chats: boolean;
   open_to_mentorship: boolean;
   available_for_referrals: boolean;
+  open_to_resume_review: boolean;
   bio?: string;
   is_alumni: boolean;
   profile_visible: boolean;
@@ -42,6 +43,7 @@ export interface UserUpdate {
   open_to_coffee_chats?: boolean;
   open_to_mentorship?: boolean;
   available_for_referrals?: boolean;
+  open_to_resume_review?: boolean;
   bio?: string;
   is_alumni?: boolean;
   profile_visible?: boolean;
@@ -68,9 +70,8 @@ export interface Interview {
   internship: boolean;
   season: string;
   passed: boolean;
-  round?: number;
-  tips?: string;
-  overview?: string;
+  note?: string;
+  date?: string;
 }
 
 // Employment Types
@@ -123,6 +124,7 @@ export interface AlumniFilters {
   open_to_coffee_chats?: boolean;
   open_to_mentorship?: boolean;
   available_for_referrals?: boolean;
+  open_to_resume_review?: boolean;
   is_alumni?: boolean;
 }
 
@@ -140,5 +142,6 @@ export interface ProfileFormData {
   open_to_coffee_chats: boolean;
   open_to_mentorship: boolean;
   available_for_referrals: boolean;
+  open_to_resume_review: boolean;
   profile_visible: boolean;
 }

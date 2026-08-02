@@ -10,7 +10,8 @@ import {
   Linkedin,
   Globe,
   Mail,
-  Building
+  Building,
+  FileText
 } from 'lucide-react';
 import { User } from '../../types';
 import Card from '../ui/Card';
@@ -110,6 +111,9 @@ const AlumniCard: React.FC<AlumniCardProps> = ({
                 {alumnus.available_for_referrals && (
                   <Badge icon={<Share2 className="h-3 w-3" />} tooltip="Available for Referrals" />
                 )}
+                {alumnus.open_to_resume_review && (
+                  <Badge icon={<FileText className="h-3 w-3" />} tooltip="Open to Resume Review" />
+                )}
               </div>
             </div>
             
@@ -201,6 +205,9 @@ const AlumniCard: React.FC<AlumniCardProps> = ({
         )}
         {alumnus.available_for_referrals && (
           <AvailabilityBadge icon={<Share2 />} label="Referrals" />
+        )}
+        {alumnus.open_to_resume_review && (
+          <AvailabilityBadge icon={<FileText />} label="Resume Review" />
         )}
       </div>
       

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { useAuthStore } from './store/authStore';
 
@@ -12,11 +12,9 @@ import ProfileSetupPage from './pages/ProfileSetupPage';
 import AlumniListPage from './pages/AlumniListPage';
 import AlumniDetailPage from './pages/AlumniDetailPage';
 import ConnectionsPage from './pages/ConnectionsPage';
-import EventsPage from './pages/EventsPage';
 import AdminPage from './pages/AdminPage';
 import TermsPage from './pages/TermsPage';
 import PrivacyPage from './pages/PrivacyPage';
-import MockCredentialsPage from './pages/MockCredentialsPage';
 import CompanyProcessesPage from './pages/CompanyProcessesPage';
 
 // Components
@@ -40,14 +38,12 @@ function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/about" element={<AboutPage />} />
             <Route path="/login" element={<LoginPage />} />
-            <Route path="/mock-login" element={<MockCredentialsPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/profile-setup" element={<ProfileSetupPage />} />
             <Route path="/alumni" element={<AlumniListPage />} />
             <Route path="/alumni/:id" element={<AlumniDetailPage />} />
             <Route path="/connections" element={<ConnectionsPage />} />
-            <Route path="/events" element={<EventsPage />} />
             <Route path="/admin" element={<AdminPage />} />
             <Route path="/terms" element={<TermsPage />} />
             <Route path="/privacy" element={<PrivacyPage />} />

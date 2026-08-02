@@ -1,15 +1,14 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { 
-  ArrowRight, 
-  Users, 
-  Briefcase, 
+import {
+  ArrowRight,
+  Users,
+  Briefcase,
   Network,
   TrendingUp,
   Award,
   BookOpen,
-  Zap,
-  CheckCircle
+  Zap
 } from 'lucide-react';
 import Hero from '../components/home/Hero';
 import Card from '../components/ui/Card';

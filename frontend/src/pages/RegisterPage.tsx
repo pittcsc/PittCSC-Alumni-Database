@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { Eye, EyeOff, GraduationCap, AlertCircle, CheckCircle } from 'lucide-react';
+import { Eye, EyeOff, GraduationCap, AlertCircle } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
