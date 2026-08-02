@@ -147,7 +147,7 @@ ALUMNI = [
     },
     {
         "email": "rohit.ganguly@pitt.edu", "full_name": "Rohit Ganguly",
-        "profile": dict(location="Los Altos, CA", graduation_year=2021,
+        "profile": dict(location="New York, NY", graduation_year=2021,
             current_company="Descope", current_role="Product Manager",
             open_to_coffee_chats=True, open_to_mentorship=True, open_to_resume_review=True),
         "company": "Descope", "since": 2024,
