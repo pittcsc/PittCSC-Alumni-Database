@@ -3,9 +3,10 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { useConnectionStore } from '../store/connectionStore';
 import { getAlumnusById } from '../lib/supabaseClient';
-import { MapPin, Briefcase, Calendar, Coffee, Users, Award, Linkedin, Globe, ArrowLeft, CheckCircle } from 'lucide-react';
+import { MapPin, Briefcase, Calendar, Award, Linkedin, Globe, ArrowLeft, CheckCircle } from 'lucide-react';
 import Button from '../components/Button';
 import ConnectionRequestModal from '../components/ConnectionRequestModal';
+import { User } from '../types';
 
 const AlumniDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -13,7 +14,7 @@ const AlumniDetailPage: React.FC = () => {
   const { createConnectionRequest } = useConnectionStore();
   const navigate = useNavigate();
   
-  const [alumni, setAlumni] = useState<any>(null);
+  const [alumni, setAlumni] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showConnectionModal, setShowConnectionModal] = useState(false);
@@ -42,7 +43,7 @@ const AlumniDetailPage: React.FC = () => {
           setAlumni(alumniData);
           setIsLoading(false);
           return;
-        } catch (supabaseError) {
+        } catch {
           console.warn('Failed to fetch alumni from Supabase, using mock data instead');
           
           // Fall back to mock data
@@ -81,8 +82,9 @@ const AlumniDetailPage: React.FC = () => {
           setAlumni(mockAlumni);
           setIsLoading(false);
         }
-      } catch (error: any) {
-        setError(error.message);
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+        setError(errorMessage);
         setIsLoading(false);
       }
     };
@@ -104,8 +106,9 @@ const AlumniDetailPage: React.FC = () => {
       await createConnectionRequest(user.id, alumni.id, message);
       setShowConnectionModal(false);
       alert('Connection request sent successfully!');
-    } catch (error: any) {
-      alert(`Error sending connection request: ${error.message}`);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      alert(`Error sending connection request: ${errorMessage}`);
     }
   };
   

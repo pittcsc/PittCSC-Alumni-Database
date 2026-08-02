@@ -4,20 +4,22 @@ import { MapPin, Briefcase, Calendar, Coffee, Users, Award } from 'lucide-react'
 import Card, { CardBody, CardFooter } from './Card';
 import Button from './Button';
 
+interface Alumni {
+  id: string;
+  full_name: string;
+  location: string;
+  majors: string[];
+  graduation_year: number;
+  internships: string[];
+  open_to_coffee_chats: boolean;
+  open_to_mentorship: boolean;
+  available_for_referrals: boolean;
+  profile_image?: string;
+}
+
 interface AlumniCardProps {
-  alumnus: {
-    id: string;
-    full_name: string;
-    location: string;
-    majors: string[];
-    graduation_year: number;
-    internships: string[];
-    open_to_coffee_chats: boolean;
-    open_to_mentorship: boolean;
-    available_for_referrals: boolean;
-    profile_image?: string;
-  };
-  onRequestConnection: (alumnus: any) => void;
+  alumnus: Alumni;
+  onRequestConnection: (alumnus: Alumni) => void;
 }
 
 const AlumniCard: React.FC<AlumniCardProps> = ({ alumnus, onRequestConnection }) => {
