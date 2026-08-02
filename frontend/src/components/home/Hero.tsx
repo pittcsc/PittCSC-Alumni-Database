@@ -1,11 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
-import { AlumniPreview } from '../../types';
 
-const Hero: React.FC<{ alumni: AlumniPreview[] }> = ({ alumni }) => {
-  const companies = new Set(alumni.map((a) => a.current_company).filter(Boolean)).size;
-
+const Hero: React.FC = () => {
   return (
     <section className="border-b-4 border-pittGold bg-pittNavy text-white">
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
@@ -26,14 +23,6 @@ const Hero: React.FC<{ alumni: AlumniPreview[] }> = ({ alumni }) => {
             <ArrowRight className="ml-2 h-5 w-5" />
           </Link>
         </div>
-
-        {alumni.length > 0 && (
-          <p className="mt-6 text-sm text-gray-400">
-            <span className="font-semibold text-white">{alumni.length}</span> alumni ·{' '}
-            <span className="font-semibold text-white">{companies}</span> companies · Interview
-            reports from Palantir, Jane Street, Meta, and more
-          </p>
-        )}
       </div>
     </section>
   );

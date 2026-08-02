@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Search, MapPin, ArrowRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { MapPin, ArrowRight } from 'lucide-react';
 import { userAPI } from '../services/api';
 import { AlumniPreview } from '../types';
 import Hero from '../components/home/Hero';
 
 // Real employers from the directory — shown as evidence, not decoration.
 const COMPANIES = [
-  'NVIDIA', 'Google', 'Meta', 'Palantir', 'Jane Street', 'Microsoft',
-  'Two Sigma', 'Bloomberg', 'Coinbase', 'Airbnb', 'Snowflake', 'Roblox',
-  'Duolingo', 'Datadog', 'Capital One', 'Stripe', 'Amazon', 'PNC',
+  'Anthropic', 'Google', 'Netflix', 'Roblox', 'AWS', 'Plaid',
+  'Descope', 'Sol Browser', 'Fragile', 'University of Maryland', 'Harvard',
 ];
 
 const initials = (name: string | null) =>
@@ -71,7 +70,6 @@ const AlumCard: React.FC<{ alum: AlumniPreview }> = ({ alum }) => {
 
 const HomePage: React.FC = () => {
   const [alumni, setAlumni] = useState<AlumniPreview[]>([]);
-  const navigate = useNavigate();
 
   useEffect(() => {
     userAPI
@@ -80,19 +78,14 @@ const HomePage: React.FC = () => {
       .catch(() => setAlumni([]));
   }, []);
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    navigate('/alumni');
-  };
-
   return (
     <div>
-      <Hero alumni={alumni} />
+      <Hero />
 
       {/* Alumni directory */}
       <section className="bg-pittLight py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+          <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
             <h2 className="font-display text-3xl font-bold text-pittDarkNavy">Alumni directory</h2>
             <Link
               to="/alumni"
@@ -102,17 +95,6 @@ const HomePage: React.FC = () => {
               <ArrowRight className="ml-1 h-4 w-4" />
             </Link>
           </div>
-
-          <form onSubmit={handleSearch} className="mb-8">
-            <div className="relative max-w-xl">
-              <Search className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search by name, company, or role..."
-                className="w-full rounded-lg border border-gray-300 bg-white py-3 pl-12 pr-4 shadow-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-pittNavy"
-              />
-            </div>
-          </form>
 
           {alumni.length === 0 ? (
             <p className="text-gray-500">Loading alumni…</p>
@@ -133,7 +115,7 @@ const HomePage: React.FC = () => {
             Where PittCSC alumni work
           </h2>
           <p className="mx-auto mt-2 max-w-2xl text-gray-600">
-            Search the directory by company, role, or graduation year to find alumni who've been
+            Browse the directory by company, role, or graduation year to find alumni who've been
             through the recruiting process at companies you're interested in.
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-3">
@@ -158,7 +140,7 @@ const HomePage: React.FC = () => {
             to="/login"
             className="mt-8 inline-flex items-center rounded-lg bg-pittGold px-6 py-3 font-semibold text-pittDarkNavy transition-colors hover:bg-pittLightGold"
           >
-            Sign in with Pitt email
+            Sign in
             <ArrowRight className="ml-2 h-5 w-5" />
           </Link>
         </div>
