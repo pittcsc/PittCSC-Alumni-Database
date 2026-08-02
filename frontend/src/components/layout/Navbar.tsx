@@ -10,7 +10,7 @@ import {
   ChevronDown
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
-import pittcscLogo from '../../images/pittcsc-logo.svg';
+import pittcscLogo from '../../images/icon.svg';
 
 const Navbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
