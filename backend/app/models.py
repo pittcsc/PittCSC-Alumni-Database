@@ -127,18 +127,6 @@ class CompaniesPublic(SQLModel):
     data: list[Company]
     count: int
 
-# INTERNSHIPS
-class Internship(SQLModel, table=True):
-    id: int | None = Field(default=None, primary_key=True)
-    user_id: int = Field(foreign_key="user.id", nullable=False)
-    company_name: str = Field(foreign_key="company.name")
-    season: datetime = None
-    length: int = 10 # Weeks
-
-class InternshipsPublic(SQLModel):
-    data: list[Internship]
-    count: int
-
 # INTERVIEWS
 class Interview(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True) # order is implicit as id is sorted
@@ -199,17 +187,6 @@ class CompletedRequest(SQLModel, table=True):
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     requester_id: int = Field(foreign_key="user.id", nullable=False)
     requested_id: int = Field(foreign_key="user.id", nullable=False)
-
-# EVENTS
-class Event(SQLModel, table=True):
-    id: int | None = Field(default=None, primary_key=True)
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-    title: str = Field(max_length=255)
-    description: str
-    date: datetime
-    location: str
-    image_url: Optional[str] = None
-
 
 # # Generic message
 class Message(SQLModel):

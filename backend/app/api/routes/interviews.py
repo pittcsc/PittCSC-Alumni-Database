@@ -27,28 +27,12 @@ def read_interviews(
     return InterviewsPublic(data=companies, count=count)
 
 
-# @router.get("/{name}", response_model=Company)
-# def read_company(
-#     name: str, session: SessionDep, current_user: CurrentUser
-# ):
-#     """
-#     retrieves company
-#     """
-#     db_company = session.get(Company, name)
-#     if not db_company:
-#         raise HTTPException(
-#             status_code=404,
-#             detail="The company with this name does not exist in the system",
-#         )
-#     return db_company
-
-
 @router.post("/", response_model=Interview)
 def create_interview(
     *, session: SessionDep, interview_in: Interview
 ) -> Any:
     """
-    Create new company.
+    Create a new interview record for a user.
     """
 
     # try catch ValidationError??
@@ -91,10 +75,5 @@ def create_interviews(
     for interview in interviews:
         session.refresh(interview)
 
-    count_statement = (
-        select(func.count())
-        .select_from(Interview)
-    )
-    count = session.exec(count_statement).one()
-
-    return InterviewsPublic(data=interviews, count=count)
+    # Return the count of interviews actually inserted in this request.
+    return InterviewsPublic(data=interviews, count=len(interviews))
