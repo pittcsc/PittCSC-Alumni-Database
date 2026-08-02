@@ -27,6 +27,7 @@ class UserRegister(SQLModel):
 class UserUpdate(UserBase):
     full_name: Optional[str] = Field(default=None, max_length=255)
     email: Optional[EmailStr] = Field(default=None, max_length=255)  # type: ignore
+    location: Optional[str] = None
     graduation_year: Optional[int] = None
     linkedin_url: Optional[str] = None
     personal_website: Optional[str] = None
@@ -36,13 +37,17 @@ class UserUpdate(UserBase):
     open_to_coffee_chats: bool = False
     open_to_mentorship: bool = False
     available_for_referrals: bool = False
+    open_to_resume_review: bool = False
     bio: Optional[str] = None
     is_alumni: Optional[bool] = False
+    profile_visible: Optional[bool] = None
+    profile_completed: Optional[bool] = None
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class UserUpdateMe(SQLModel):
     full_name: Optional[str] = Field(default=None, max_length=255)
     email: Optional[EmailStr] = Field(default=None, max_length=255)
+    location: Optional[str] = None
     graduation_year: Optional[int] = None
     linkedin_url: Optional[str] = None
     personal_website: Optional[str] = None
@@ -52,8 +57,11 @@ class UserUpdateMe(SQLModel):
     open_to_coffee_chats: bool = False
     open_to_mentorship: bool = False
     available_for_referrals: bool = False
+    open_to_resume_review: bool = False
     bio: Optional[str] = None
     is_alumni: Optional[bool] = False
+    profile_visible: Optional[bool] = None
+    profile_completed: Optional[bool] = None
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class UpdatePassword(SQLModel):
@@ -77,6 +85,7 @@ class User(UserBase, table=True):
     open_to_coffee_chats: bool = False
     open_to_mentorship: bool = False
     available_for_referrals: bool = False
+    open_to_resume_review: bool = False
     bio: Optional[str] = None
     is_alumni: bool = False
     profile_completed: bool = False
@@ -95,9 +104,11 @@ class UserPublic(UserBase):
     open_to_coffee_chats: Optional[bool]
     open_to_mentorship: Optional[bool]
     available_for_referrals: Optional[bool]
+    open_to_resume_review: Optional[bool]
     bio: Optional[str]
     is_alumni: Optional[bool]
     profile_visible: Optional[bool]
+    profile_completed: Optional[bool]
 
 class UsersPublic(SQLModel):
     data: list[UserPublic]
