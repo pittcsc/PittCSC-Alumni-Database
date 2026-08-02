@@ -11,6 +11,8 @@ interface AuthState {
   
   // Actions
   login: (username: string, password: string) => Promise<void>;
+  requestOtp: (email: string) => Promise<{ message: string; dev_code?: string | null }>;
+  loginWithOtp: (email: string, code: string) => Promise<void>;
   register: (email: string, password: string, fullName: string) => Promise<void>;
   logout: () => Promise<void>;
   fetchCurrentUser: () => Promise<void>;
@@ -48,6 +50,36 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
   },
   
+  requestOtp: async (email: string) => {
+    try {
+      set({ isLoading: true, error: null });
+      return await authAPI.requestOtp(email);
+    } catch (error: any) {
+      set({ error: error.response?.data?.detail || 'Could not send login code' });
+      throw error;
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
+  loginWithOtp: async (email: string, code: string) => {
+    try {
+      set({ isLoading: true, error: null });
+      const response = await authAPI.verifyOtp(email, code);
+      set({ accessToken: response.access_token });
+      await get().fetchCurrentUser();
+      set({ isAuthenticated: true });
+    } catch (error: any) {
+      set({
+        error: error.response?.data?.detail || 'Invalid or expired code',
+        isAuthenticated: false,
+      });
+      throw error;
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
   register: async (email: string, password: string, fullName: string) => {
     try {
       set({ isLoading: true, error: null });
