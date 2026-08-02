@@ -1,0 +1,62 @@
+# Render blueprint for the PittCSC Alumni backend + Postgres.
+# In Render: New → Blueprint → point at this repo. It creates the web service and
+# database and wires the DB connection env vars automatically.
+#
+# Secrets (marked `sync: false`) must be filled in the Render dashboard after the
+# first deploy: FIRST_SUPERUSER / _PASSWORD and the SMTP_* vars (SMTP is REQUIRED
+# for email-OTP login to work in production — without it users can't receive codes).
+
+databases:
+  - name: pittcsc-alumni-db
+    plan: free
+    databaseName: alumni_db
+    user: alumni_user
+
+services:
+  - type: web
+    name: pittcsc-alumni-api
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: free
+    healthCheckPath: /api/v1/utils/health-check/
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: SECRET_KEY
+        generateValue: true          # stable per-service key so sessions survive restarts
+      - key: FRONTEND_HOST
+        value: https://alumni.pittcs.wiki
+      - key: BACKEND_CORS_ORIGINS
+        value: https://alumni.pittcs.wiki
+      # --- Postgres connection (auto-filled from the database above) ---
+      - key: POSTGRES_SERVER
+        fromDatabase: { name: pittcsc-alumni-db, property: host }
+      - key: POSTGRES_PORT
+        fromDatabase: { name: pittcsc-alumni-db, property: port }
+      - key: POSTGRES_DB
+        fromDatabase: { name: pittcsc-alumni-db, property: database }
+      - key: POSTGRES_USER
+        fromDatabase: { name: pittcsc-alumni-db, property: user }
+      - key: POSTGRES_PASSWORD
+        fromDatabase: { name: pittcsc-alumni-db, property: password }
+      # --- First admin (set in dashboard) ---
+      - key: FIRST_SUPERUSER
+        sync: false
+      - key: FIRST_SUPERUSER_PASSWORD
+        sync: false
+      - key: FIRST_SUPERUSER_NAME
+        value: PittCSC Admin
+      # --- SMTP for OTP + notification emails (set in dashboard) ---
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_PORT
+        value: "587"
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASSWORD
+        sync: false
+      - key: EMAILS_FROM_EMAIL
+        sync: false
+      - key: EMAILS_FROM_NAME
+        value: PittCSC Alumni Network

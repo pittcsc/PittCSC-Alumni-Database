@@ -1,0 +1,33 @@
+# Netlify config for the PittCSC Alumni frontend (static SPA).
+# The backend is hosted separately on Render; the frontend talks to it via the
+# VITE_API_URL env var (set in Netlify → Site settings → Environment variables),
+# e.g. https://pittcsc-alumni-api.onrender.com/api/v1
+
+[build]
+  base = "frontend"          # run the build from ./frontend
+  publish = "dist"           # frontend/dist (relative to base)
+  command = "npm run build"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# SPA routing: serve index.html for any client-side route
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Security headers
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+
+# Long-cache hashed static assets
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
