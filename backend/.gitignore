@@ -1,4 +1,6 @@
 __pycache__
 .venv
+venv/
 alumni.db
+*.db
 .env

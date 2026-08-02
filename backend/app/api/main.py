@@ -1,17 +1,15 @@
 from fastapi import APIRouter
 
 from app.api.routes import (
-    companies, 
-    interviews, 
-    login, 
-    private, 
-    users, 
-    utils, 
-    emails, 
-    requests, 
-    employment
+    companies,
+    interviews,
+    login,
+    users,
+    utils,
+    emails,
+    requests,
+    employment,
 )
-from app.core.config import settings
 
 api_router = APIRouter()
 api_router.include_router(emails.router)
@@ -22,7 +20,3 @@ api_router.include_router(users.router)
 api_router.include_router(utils.router)
 api_router.include_router(requests.router)
 api_router.include_router(employment.router)
-
-
-if settings.ENVIRONMENT == "local":
-    api_router.include_router(private.router)
