@@ -110,6 +110,12 @@ export const userAPI = {
     return response.data;
   },
 
+  // Public landing-page teaser (no auth required)
+  async getPreview(limit = 12) {
+    const response = await api.get('/users/preview', { params: { limit } });
+    return response.data;
+  },
+
   async getUserById(userId: number) {
     const response = await api.get(`/users/${userId}`);
     return response.data;
