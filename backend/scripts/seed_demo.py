@@ -77,7 +77,7 @@ ALUMNI = [
     },
     {
         "email": "jeremy.luu@pitt.edu", "full_name": "Jeremy Luu",
-        "profile": dict(location="San Francisco, CA", graduation_year=2025,
+        "profile": dict(location="Redwood City, CA", graduation_year=2025,
             current_company="Character.AI", current_role="Member of Technical Staff",
             open_to_coffee_chats=True, open_to_mentorship=True),
         "company": "Character.AI", "since": 2025,

@@ -73,8 +73,7 @@ const AlumCard: React.FC<{ alum: AlumniPreview }> = ({ alum }) => {
         <div className="min-w-0">
           <p className="truncate font-semibold text-pittDarkNavy">{alum.full_name}</p>
           <p className="truncate text-sm text-gray-600">
-            {alum.current_role}
-            {alum.current_company ? ` · ${alum.current_company}` : ''}
+            {[alum.current_company, alum.current_role].filter(Boolean).join(' · ')}
           </p>
         </div>
       </div>
