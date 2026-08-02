@@ -27,7 +27,7 @@ const HomePage: React.FC = () => {
               Why Join Our Network?
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Connect with a vibrant community of Pitt CSC alumni and unlock opportunities for growth
+              Connect with a vibrant community of PittCSC alumni and unlock opportunities for growth
             </p>
           </div>
           
@@ -86,7 +86,7 @@ const HomePage: React.FC = () => {
               How It Works
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Get started with the Pitt CSC Alumni Network in three simple steps
+              Get started with the PittCSC Alumni Network in three simple steps
             </p>
           </div>
           
@@ -131,7 +131,7 @@ const HomePage: React.FC = () => {
               Ready to Join the Network?
             </h2>
             <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
-              Connect with fellow Pitt CSC alumni and take your career to the next level. 
+              Connect with fellow PittCSC alumni and take your career to the next level. 
               Registration is free and takes less than 5 minutes.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">

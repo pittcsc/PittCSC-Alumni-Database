@@ -48,7 +48,7 @@ const Footer: React.FC = () => {
             </h4>
             <ul className="space-y-2">
               <FooterLink to="https://pittcsc.org/" external>
-                Pitt CSC Website
+                PittCSC Website
                 <ExternalLink className="inline-block w-3 h-3 ml-1" />
               </FooterLink>
             </ul>
@@ -62,7 +62,7 @@ const Footer: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-gray-400">
             <div className="flex items-center">
-              Made with <Heart className="h-4 w-4 mx-1 text-red-500" /> by Pitt CSC
+              Made with <Heart className="h-4 w-4 mx-1 text-red-500" /> by PittCSC
             </div>
             <div>
               © {currentYear} University of Pittsburgh Computer Science Club. All rights reserved.

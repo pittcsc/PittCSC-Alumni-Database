@@ -108,7 +108,7 @@ const AlumniListPage: React.FC = () => {
             Alumni Directory
           </h1>
           <p className="text-lg text-gray-600">
-            Connect with Pitt CSC alumni from around the world
+            Connect with PittCSC alumni from around the world
           </p>
         </div>
         
