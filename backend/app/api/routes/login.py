@@ -165,6 +165,10 @@ def verify_otp(body: OTPVerify, session: SessionDep) -> Token:
                 full_name=None,
             ),
         )
+        # Passwordless sign-ups start hidden from the directory until they
+        # complete their profile (nothing to show yet).
+        user.profile_visible = False
+        session.add(user)
         session.add(Email(email=user.email, preferred=True, user_id=user.id))
     elif not user.is_active:
         raise HTTPException(status_code=400, detail="Inactive user")
