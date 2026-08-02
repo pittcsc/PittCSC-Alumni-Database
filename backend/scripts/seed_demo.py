@@ -44,6 +44,23 @@ COMPANIES = {
 }
 
 
+# email -> profile photo (served by the frontend from public/alumni/)
+PFP = {
+    "richie.goulazian@pitt.edu": "/alumni/richie.jpeg",
+    "jeremy.luu@pitt.edu": "/alumni/jeremy.jpeg",
+    "ritwik.gupta@pitt.edu": "/alumni/ritwik.jpeg",
+    "quentin.romerolauro@pitt.edu": "/alumni/quentin.jpeg",
+    "nij.patel@pitt.edu": "/alumni/nij.png",
+    "brayden.nguyen@pitt.edu": "/alumni/brayden.jpeg",
+    "olivia.wininsky@pitt.edu": "/alumni/olivia.jpeg",
+    "rachel.jan@pitt.edu": "/alumni/rachel.jpeg",
+    "delaney.scheidell@pitt.edu": "/alumni/delaney.jpeg",
+    "michael.henry@pitt.edu": "/alumni/michael.jpeg",
+    "julian.alamorosas@pitt.edu": "/alumni/julian.jpeg",
+    "rohit.ganguly@pitt.edu": "/alumni/rohit.jpeg",
+}
+
+
 def _d(year: int, month: int = 6, day: int = 1) -> datetime:
     return datetime(year, month, day, tzinfo=timezone.utc)
 
@@ -166,6 +183,7 @@ def seed() -> None:
                 setattr(user, k, v)
             user.is_alumni = True
             user.profile_completed = True
+            user.profile_image = PFP.get(alum["email"])
             session.add(user)
             session.add(Email(email=user.email, preferred=True, user_id=user.id))
 

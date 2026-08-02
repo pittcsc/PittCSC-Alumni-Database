@@ -5,13 +5,34 @@ import { userAPI } from '../services/api';
 import { AlumniPreview } from '../types';
 import Hero from '../components/home/Hero';
 
-// Real employers from the directory — shown as evidence, not decoration.
-const COMPANIES = [
-  'Anthropic', 'Character.AI', 'Google', 'Netflix', 'Roblox', 'AWS',
-  'Plaid', 'Descope', 'NVIDIA', 'Amazon', 'Meta', 'Scale AI',
-  'Microsoft', 'Coinbase', 'Lockheed Martin', 'PNC', 'Capital One', 'Vanguard',
-  'BNY', 'Wabtec', 'Aurora', 'Eaton', 'Ansys', 'Numo',
-  'NFL', "Dick's Sporting Goods",
+// Companies PittCSC alumni have gone to — each links to the company's site.
+const COMPANIES: { name: string; url: string }[] = [
+  { name: 'Anthropic', url: 'https://www.anthropic.com' },
+  { name: 'Character.AI', url: 'https://character.ai' },
+  { name: 'Google', url: 'https://www.google.com' },
+  { name: 'Netflix', url: 'https://www.netflix.com' },
+  { name: 'Roblox', url: 'https://www.roblox.com' },
+  { name: 'AWS', url: 'https://aws.amazon.com' },
+  { name: 'Plaid', url: 'https://plaid.com' },
+  { name: 'Descope', url: 'https://www.descope.com' },
+  { name: 'NVIDIA', url: 'https://www.nvidia.com' },
+  { name: 'Amazon', url: 'https://www.amazon.com' },
+  { name: 'Meta', url: 'https://www.meta.com' },
+  { name: 'Scale AI', url: 'https://scale.com' },
+  { name: 'Microsoft', url: 'https://www.microsoft.com' },
+  { name: 'Coinbase', url: 'https://www.coinbase.com' },
+  { name: 'Lockheed Martin', url: 'https://www.lockheedmartin.com' },
+  { name: 'PNC', url: 'https://www.pnc.com' },
+  { name: 'Capital One', url: 'https://www.capitalone.com' },
+  { name: 'Vanguard', url: 'https://investor.vanguard.com' },
+  { name: 'BNY', url: 'https://www.bny.com' },
+  { name: 'Wabtec', url: 'https://www.wabtec.com' },
+  { name: 'Aurora', url: 'https://aurora.tech' },
+  { name: 'Eaton', url: 'https://www.eaton.com' },
+  { name: 'Ansys', url: 'https://www.ansys.com' },
+  { name: 'Numo', url: 'https://www.numo.com' },
+  { name: 'NFL', url: 'https://www.nfl.com' },
+  { name: "Dick's Sporting Goods", url: 'https://www.dickssportinggoods.com' },
 ];
 
 const initials = (name: string | null) =>
@@ -38,8 +59,16 @@ const AlumCard: React.FC<{ alum: AlumniPreview }> = ({ alum }) => {
       className="flex flex-col rounded-xl border border-gray-200 bg-white p-5 transition-shadow hover:shadow-md"
     >
       <div className="flex items-center gap-3">
-        <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full bg-pittNavy text-sm font-bold text-white">
-          {initials(alum.full_name)}
+        <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-pittNavy text-sm font-bold text-white">
+          {alum.profile_image ? (
+            <img
+              src={alum.profile_image}
+              alt={alum.full_name || 'Alumni'}
+              className="h-full w-full object-cover"
+            />
+          ) : (
+            initials(alum.full_name)
+          )}
         </div>
         <div className="min-w-0">
           <p className="truncate font-semibold text-pittDarkNavy">{alum.full_name}</p>
@@ -123,9 +152,15 @@ const HomePage: React.FC = () => {
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-3">
             {COMPANIES.map((c) => (
-              <span key={c} className="font-medium text-gray-700">
-                {c}
-              </span>
+              <a
+                key={c.name}
+                href={c.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-medium text-gray-700 transition-colors hover:text-pittNavy"
+              >
+                {c.name}
+              </a>
             ))}
           </div>
         </div>
