@@ -1,57 +1,56 @@
-# CSC Alumni Network API Documentation
+# PittCSC Alumni Network API
 
-This document provides a brief overview of all available API routes in the Alumni Network backend. Easiest way to check is to run backend and look at the /docs page.
+Overview of the backend API routes. All routes are under `/api/v1`. The easiest reference is the live, auto-generated docs — run the backend and open `/docs`.
 
-## Authentication Routes (`/login`)
-- `POST /login/access-token`: Authenticates user and returns JWT access token
-- `POST /login/test-token`: Validates current access token
-- `POST /login/reset-password`: Sends password reset email
-- `POST /login/reset-password/{token}`: Resets password using token
+## Auth (`/login`)
+- `POST /login/access-token` — password login, returns a JWT
+- `POST /login/test-token` — validate the current token
+- `POST /login/otp/request` — passwordless: email a 6-digit code (dev returns it in the response)
+- `POST /login/otp/verify` — verify the code, returns a JWT (creates the account if new)
+- `POST /password-recovery/{email}` — email a password-reset link
+- `POST /reset-password/` — reset a password with a token
 
-## User Routes (`/users`)
-- `GET /users/`: Retrieves list of visible users (paginated)
-- `POST /users/`: Creates new user (admin only)
-- `PATCH /users/me`: Updates current user's profile
-- `PATCH /users/me/password`: Updates current user's password
-- `GET /users/me`: Gets current user's profile
-- `DELETE /users/me`: Deletes current user's account
-- `POST /users/signup`: Registers new user (public)
-- `GET /users/{user_id}`: Gets specific user by ID
-- `PATCH /users/{user_id}`: Updates specific user (admin only)
-- `DELETE /users/{user_id}`: Deletes specific user (admin only)
-- `GET /users/company/{company_name}`: Gets users by company
+## Users (`/users`)
+- `GET /users/` — list visible users (paginated; auth)
+- `GET /users/preview` — small public teaser for the landing page (no auth)
+- `GET /users/me` · `PATCH /users/me` · `PATCH /users/me/password` · `DELETE /users/me`
+- `POST /users/signup` — public registration
+- `GET /users/{id}` — get a user
+- `POST /users/` · `PATCH /users/{id}` · `DELETE /users/{id}` — admin only
+- `GET /users/company/{company_name}` — users at a company
 
-## Company Routes (`/companies`)
-- `GET /companies/`: Retrieves list of all companies
-- `GET /companies/employee_counts`: Gets current employee counts for all companies
-- `GET /companies/{name}`: Gets specific company details
-- `POST /companies/`: Creates new company
-- `GET /companies/all_employees/{name}`: Gets all employees (current and past) for a company
-- `GET /companies/current_employees/{name}`: Gets current employees for a company
+## Companies (`/companies`)
+- `GET /companies/` · `POST /companies/`
+- `GET /companies/{name}`
+- `GET /companies/employee_counts`
+- `GET /companies/current_employees/{name}` · `GET /companies/all_employees/{name}`
 
-## Interview Routes (`/interviews`)
-- `GET /interviews/`: Retrieves all interviews
-- `POST /interviews/`: Creates new interview record
-- `POST /interviews/bulk`: Creates multiple interview records
+## Interviews (`/interviews`)
+- `GET /interviews/` — all interview reports
+- `POST /interviews/` · `POST /interviews/bulk`
 
-## Employment Routes (`/employment`)
-- `GET /employment/`: Gets employment history
-- `POST /employment/`: Creates new employment record
-- `GET /employment/company/{company_name}`: Gets employment history for a company
+## Employment (`/employment`)
+- `GET /employment/` — current user's employment history
+- `POST /employment/` — add an entry (auto-creates the company)
+- `DELETE /employment/{id}`
 
-## Request Routes (`/requests`)
-- `GET /requests/`: Gets all connection requests
-- `POST /requests/`: Creates new connection request
-- `GET /requests/{request_id}`: Gets specific connection request
-- `PATCH /requests/{request_id}`: Updates connection request status
+## Connections (`/connections`)
+- `POST /connections/` — send a connection request (emails the recipient)
+- `POST /connections/accept/{request_id}` · `POST /connections/ignore/{request_id}`
+- `DELETE /connections/{connection_id}`
+- `GET /connections/pending/incoming` — pending requests sent to me
+- `GET /connections/{user_id}/accepted_requests` · `GET /connections/{user_id}/accepted_requested`
 
-## Email Routes (`/emails`)
-- `GET /emails/`: Gets all email addresses
-- `POST /emails/`: Adds new email address
-- `DELETE /emails/{email}`: Removes email address
+## Emails (`/emails`)
+- `POST /emails/me` — add an email to my account
+- `PATCH /emails/me/preferred` — set my preferred email
+- `GET /emails/{user_id}` — list a user's emails (admin only)
+
+## Utils (`/utils`)
+- `GET /utils/health-check/` — liveness probe
+- `POST /utils/test-email/` — send a test email (admin only)
 
 ## Notes
-- All routes require authentication unless specified otherwise
-- Pagination is available on list endpoints using `skip` and `limit` parameters
-- Admin-only routes are marked with (admin only)
-- Public routes are marked with (public)
+- Routes require authentication unless marked public.
+- List endpoints paginate via `skip` / `limit`.
+- OTP login needs SMTP configured in production; in local/dev the code is returned in the response instead of emailed.

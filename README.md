@@ -1,262 +1,98 @@
-:P
-# Pitt CSC Alumni Network
+# PittCSC Alumni Network
 
-## Tech Stack
+A directory of University of Pittsburgh Computer Science Club alumni — where they work, where they interviewed, and how they can help current students (coffee chats, mentorship, referrals, resume reviews).
 
-### Backend
-- **FastAPI**
-- **SQLModel**
-- **SQLite**
-- **JWT Authentication**
-- **SMTP Email**
+## Tech stack
 
-### Frontend
-- **React 18** - Modern React with hooks
-- **TypeScript** - Type-safe JavaScript
-- **Vite** - Fast build tool and development server
-- **Tailwind CSS** - Utility-first CSS framework
-- **Zustand** - Lightweight state management
-- **Lucide React** - Beautiful, customizable icons
-- **Axios** - HTTP client for API calls
+**Backend** — FastAPI · SQLModel · SQLite (dev) / Postgres (prod) · JWT + passwordless email OTP · SMTP
+
+**Frontend** — React 18 · TypeScript · Vite · Tailwind CSS · Zustand · Axios · Lucide
 
 ## Prerequisites
 
-- **Python 3.8+**
-- **Node.js 16+**
-- **npm or yarn**
+- Python 3.12
+- Node.js 20
+- (Prod only) Postgres + an SMTP provider
 
-## Getting Started
+## Local development
 
-### 1. Clone the Repository
+The backend runs on **SQLite with zero config** and seeds a first admin on startup — no database setup needed.
 
-```bash
-git clone <repository-url>
-cd Alumni
-```
-
-### 2. Backend Setup
+### Backend
 
 ```bash
-# Navigate to backend directory
 cd backend
-
-# Create a virtual environment
-python -m venv venv
-
-# Activate virtual environment
-# On macOS/Linux:
-source venv/bin/activate
-# On Windows:
-venv\Scripts\activate
-
-# Install dependencies
+python3.12 -m venv venv && source venv/bin/activate
 pip install -r requirements.txt
-
-# Set up environment variables (optional)
-# Copy and modify the example env file if needed
-# The app will work with default settings
-
-# Initialize the database and run the server
-python -m uvicorn app.main:app --reload
+uvicorn app.main:app --host 127.0.0.1 --port 8000
 ```
 
-The backend will be running at `http://localhost:8000`
-- API documentation: `http://localhost:8000/docs`
-- Alternative docs: `http://localhost:8000/redoc`
+- API: `http://127.0.0.1:8000` · docs at `/docs`
+- On first boot it creates the tables and the admin from `.env` (`admin@test.com` / `admin123` by default).
+- Load demo alumni: `python -m scripts.seed_demo`
 
-### 3. Frontend Setup
-
-Open a new terminal window/tab:
+### Frontend
 
 ```bash
-# Navigate to frontend directory
 cd frontend
-
-# Install dependencies
 npm install
-
-# Start the development server
-npm run dev
+echo 'VITE_API_URL=http://127.0.0.1:8000/api/v1' > .env.local
+npm run dev            # http://localhost:5173
 ```
 
-The frontend will be running at `http://localhost:5173`
+> Use `127.0.0.1`, not `localhost`, in `VITE_API_URL` — some machines resolve `localhost` to IPv6 while the dev backend binds IPv4, which causes 404s.
 
-### 4. Access the Application
+### Signing in (dev)
 
-1. Open your browser and go to `http://localhost:5173`
-2. You'll see the modern Pitt CSC Alumni Network homepage
-3. Create an account or browse the alumni directory
-4. The app will automatically connect to the backend API
+- **Email OTP (default):** enter any `@pitt.edu` email → the 6-digit code is shown on screen in dev (SMTP is off locally) → sign in. New emails auto-create an account.
+- **Password:** `admin@test.com` / `admin123` (admin), or any seeded alum with `pittcsc2025`.
 
-## Development Commands
+## Environment variables
 
-### Backend Commands
+- Backend reads the repo-root `.env` — see [`.env.example`](.env.example).
+- Frontend reads `frontend/.env.local` — see [`frontend/.env.example`](frontend/.env.example).
+- Local dev uses SQLite; set `POSTGRES_SERVER` (+ `POSTGRES_*`) to switch to Postgres.
+- **SMTP is required in production** for OTP login to deliver codes (password login works without it).
 
-```bash
-cd backend
+## Deployment
 
-# Start development server with auto-reload
-python -m uvicorn app.main:app --reload
+Backend on Render (Docker + managed Postgres), frontend on Netlify, served at `alumni.pittcs.wiki`. Full runbook: [`DEPLOYMENT.md`](DEPLOYMENT.md) (blueprint in [`render.yaml`](render.yaml), config in [`netlify.toml`](netlify.toml)).
 
-# Run with custom host/port
-python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
-
-# Reset database (if needed)
-python drop.py
-```
-
-### Frontend Commands
-
-```bash
-cd frontend
-
-# Start development server
-npm run dev
-
-# Build for production
-npm run build
-
-# Preview production build
-npm run preview
-
-# Run linting
-npm run lint
-
-# Update browserslist database
-npx update-browserslist-db@latest
-```
-
-## Environment Variables
-
-### Backend (.env in root directory)
-```env
-# Database
-SQLITE_DB=sqlite:///./alumni.db
-
-# Security
-SECRET_KEY=your-secret-key-here
-ACCESS_TOKEN_EXPIRE_MINUTES=43200
-
-# Email (optional)
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=587
-SMTP_USER=your-email@gmail.com
-SMTP_PASSWORD=your-app-password
-EMAILS_FROM_EMAIL=noreply@pittcsc.org
-EMAILS_FROM_NAME=Pitt CSC Alumni Network
-
-# Admin User (optional)
-FIRST_SUPERUSER=admin@pittcsc.org
-FIRST_SUPERUSER_PASSWORD=admin
-FIRST_SUPERUSER_NAME=Admin User
-```
-
-### Frontend (.env in frontend directory)
-```env
-# API Configuration
-VITE_API_URL=http://localhost:8000/api/v1
-
-# App Configuration
-VITE_APP_NAME=Pitt CSC Alumni Network
-VITE_ENV=development
-```
-
-## Project Structure
+## Project structure
 
 ```
-Alumni/
-├── backend/                 # FastAPI backend
-│   ├── app/
-│   │   ├── api/            # API routes
-│   │   ├── core/           # Configuration and security
-│   │   ├── email_templates/ # Email templates
-│   │   └── models.py       # Database models
-│   ├── requirements.txt    # Python dependencies
-│   └── drop.py            # Database reset script
-├── frontend/               # React frontend
-│   ├── src/
-│   │   ├── components/     # Reusable components
-│   │   │   ├── alumni/    # Alumni-specific components
-│   │   │   ├── home/      # Homepage components
-│   │   │   ├── layout/    # Layout components
-│   │   │   └── ui/        # UI components
-│   │   ├── pages/         # Page components
-│   │   ├── services/      # API services
-│   │   ├── store/         # State management
-│   │   └── types/         # TypeScript types
-│   ├── package.json       # Node dependencies
-│   └── tailwind.config.js # Tailwind configuration
-└── README.md              # This file
+backend/
+  app/
+    api/routes/     # auth (login + OTP), users, companies, interviews,
+                    # employment, connections, emails, utils
+    core/           # config, db, security
+    models.py       # SQLModel tables + schemas
+  scripts/seed_demo.py
+frontend/
+  src/
+    components/     # ui/, layout/, alumni/, home/
+    pages/          # Home, Alumni list/detail, Profile, Interview Prep, Admin, ...
+    services/api.ts # FastAPI client
+    store/          # Zustand stores (auth, alumni, connection, profile, admin)
 ```
 
-## API Endpoints
+## API
 
-The backend provides a comprehensive REST API. Key endpoints include:
+REST API under `/api/v1`. Auth is JWT (Bearer). Browse the full, live API at `http://127.0.0.1:8000/docs`. Highlights:
 
-### Authentication
-- `POST /api/v1/login/access-token` - User login
-- `POST /api/v1/users/signup` - User registration
-- `GET /api/v1/users/me` - Get current user
+- `POST /login/access-token`, `POST /login/otp/request`, `POST /login/otp/verify`
+- `GET /users/`, `GET /users/{id}`, `GET /users/preview` (public), `PATCH /users/me`
+- `GET /companies/`, `GET /interviews/`, `GET /employment/`
+- `POST /connections/`, `POST /connections/accept/{id}`, `GET /connections/pending/incoming`
 
-### Users/Alumni
-- `GET /api/v1/users/` - Get all users (paginated)
-- `GET /api/v1/users/{user_id}` - Get user by ID
-- `PATCH /api/v1/users/me` - Update current user profile
+## Design
 
-### Companies
-- `GET /api/v1/companies/` - Get all companies
-- `GET /api/v1/companies/{name}` - Get company details
-
-### Connections
-- `GET /api/v1/requests/` - Get connection requests
-- `POST /api/v1/requests/` - Create connection request
-
-Visit `http://localhost:8000/docs` for complete API documentation.
-
-## Design System
-
-The frontend uses a modern design system based on Pitt CSC branding:
-
-- **Colors**: Pitt Navy (#003594), Pitt Gold (#FFB81C), and semantic colors
-- **Typography**: Inter for body text, Lexend for headings
-- **Components**: Consistent, accessible UI components
-- **Animations**: Smooth transitions and micro-interactions
-- **Responsive**: Mobile-first design approach
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
-
-## Troubleshooting
-
-### Common Issues
-
-1. **Port conflicts**: Change ports in the run commands if 8000 or 5173 are in use
-2. **Database issues**: Run `python drop.py` in the backend to reset the database
-3. **Package issues**: Delete `node_modules` and run `npm install` again
-4. **CORS errors**: Ensure the backend CORS settings include your frontend URL
-
-### Getting Help
-
-- Check the API documentation at `http://localhost:8000/docs`
-- Review the console for error messages
-- Ensure both backend and frontend are running
-- Verify environment variables are set correctly
+CSC blue `#1d2758` (the printer-gamut brand blue used on the logo and pittcs.wiki) with gold `#FFB81C`. Inter for body, Lexend for headings.
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+MIT — see `LICENSE`.
 
 ## Contact
 
-For questions about the Pitt CSC Alumni Network, contact:
-- **Pitt CSC**: [https://pittcsc.org](https://pittcsc.org)
-- **Email**: alumni@pittcsc.org
-
----
-
-Built with ❤️ by the Pitt Computer Science Club
+PittCSC — [pittcsc.org](https://pittcsc.org)
