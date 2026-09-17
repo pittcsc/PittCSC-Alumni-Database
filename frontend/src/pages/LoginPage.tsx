@@ -105,7 +105,7 @@ const LoginPage: React.FC = () => {
           </div>
           <h2 className="mt-6 text-3xl font-display font-bold text-white">Welcome back</h2>
           <p className="mt-2 text-sm text-gray-300">
-            Sign in to the Pitt CSC Alumni Network
+            Sign in to the PittCSC Alumni Network
           </p>
         </div>
 

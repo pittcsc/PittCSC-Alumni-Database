@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Sparkles, ChevronDown } from 'lucide-react';
+import { ArrowRight, ChevronDown } from 'lucide-react';
 
 const Hero: React.FC = () => {
   return (
@@ -18,16 +18,10 @@ const Hero: React.FC = () => {
       </div>
       
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        {/* Badge */}
-        <div className="inline-flex items-center px-4 py-2 rounded-full bg-pittGold/20 border border-pittGold/30 backdrop-blur-sm mb-8 animate-fade-in">
-          <Sparkles className="h-4 w-4 text-pittGold mr-2" />
-          <span className="text-sm font-medium text-pittGold">Welcome to the Network</span>
-        </div>
-        
         {/* Main Heading */}
         <h1 className="text-5xl md:text-7xl font-display font-bold text-white mb-6 animate-slide-up">
           Connect with
-          <span className="block text-pittGold mt-2">Pitt CSC Alumni</span>
+          <span className="block text-pittGold mt-2">PittCSC Alumni</span>
         </h1>
         
         {/* Subtitle */}

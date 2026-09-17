@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
-  GraduationCap,
   Menu,
   X,
   Briefcase,
@@ -11,6 +10,7 @@ import {
   ChevronDown
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
+import pittcscLogo from '../../images/icon.svg';
 
 const Navbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -38,9 +38,8 @@ const Navbar: React.FC = () => {
           {/* Logo Section */}
           <div className="flex items-center">
             <Link to="/" className="flex items-center group">
-              <div className="relative">
-                <GraduationCap className="h-9 w-9 text-pittGold transition-transform duration-300 group-hover:scale-110" />
-                <div className="absolute inset-0 bg-pittGold/20 rounded-full blur-xl group-hover:bg-pittGold/30 transition-colors"></div>
+              <div className="bg-white rounded-lg p-1 shadow-sm transition-transform duration-300 group-hover:scale-105">
+                <img src={pittcscLogo} alt="PittCSC" className="h-9 w-9" />
               </div>
               <div className="ml-3">
                 <span className="text-xl font-bold font-display text-white">PittCSC</span>

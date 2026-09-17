@@ -76,7 +76,7 @@ const RegisterPage: React.FC = () => {
             Join the Network
           </h2>
           <p className="mt-2 text-sm text-gray-300">
-            Connect with Pitt CSC alumni worldwide
+            Connect with PittCSC alumni worldwide
           </p>
         </div>
 
