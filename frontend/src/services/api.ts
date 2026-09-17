@@ -69,6 +69,19 @@ export const authAPI = {
     return response.data;
   },
 
+  // Passwordless email OTP
+  async requestOtp(email: string): Promise<{ message: string; dev_code?: string | null }> {
+    const response = await api.post('/login/otp/request', { email });
+    return response.data;
+  },
+
+  async verifyOtp(email: string, code: string) {
+    const response = await api.post('/login/otp/verify', { email, code });
+    accessToken = response.data.access_token;
+    if (accessToken) localStorage.setItem('access_token', accessToken);
+    return response.data;
+  },
+
   async logout() {
     localStorage.removeItem('access_token');
     accessToken = null;

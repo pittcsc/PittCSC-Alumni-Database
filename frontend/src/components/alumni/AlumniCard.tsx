@@ -27,6 +27,10 @@ const AlumniCard: React.FC<AlumniCardProps> = ({
   onConnect,
   variant = 'grid' 
 }) => {
+  // full_name is nullable (e.g. passwordless accounts that haven't onboarded),
+  // so fall back to the email/local-part for display.
+  const displayName = alumnus.full_name || alumnus.email?.split('@')[0] || 'Alumni';
+
   const getInitials = (name: string) => {
     return name
       .split(' ')
@@ -41,7 +45,7 @@ const AlumniCard: React.FC<AlumniCardProps> = ({
       return (
         <img 
           src={alumnus.profile_image} 
-          alt={alumnus.full_name}
+          alt={displayName}
           className="w-full h-full object-cover"
         />
       );
@@ -50,7 +54,7 @@ const AlumniCard: React.FC<AlumniCardProps> = ({
     return (
       <div className="w-full h-full bg-gradient-pitt flex items-center justify-center">
         <span className="text-2xl font-bold text-white">
-          {getInitials(alumnus.full_name)}
+          {getInitials(displayName)}
         </span>
       </div>
     );
@@ -73,7 +77,7 @@ const AlumniCard: React.FC<AlumniCardProps> = ({
                   to={`/alumni/${alumnus.id}`}
                   className="text-xl font-semibold text-pittDarkNavy hover:text-pittNavy transition-colors"
                 >
-                  {alumnus.full_name}
+                  {displayName}
                 </Link>
                 
                 <div className="flex flex-wrap gap-4 mt-2 text-sm text-gray-600">
@@ -161,7 +165,7 @@ const AlumniCard: React.FC<AlumniCardProps> = ({
             to={`/alumni/${alumnus.id}`}
             className="font-semibold text-lg text-pittDarkNavy hover:text-pittNavy transition-colors block truncate"
           >
-            {alumnus.full_name}
+            {displayName}
           </Link>
           {alumnus.current_role && (
             <p className="text-sm text-gray-600 truncate">

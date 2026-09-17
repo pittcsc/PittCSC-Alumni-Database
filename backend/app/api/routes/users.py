@@ -22,11 +22,37 @@ from app.models import (
     UpdatePassword,
     EmailBase,
     EmailsPublic,
-    Email
+    Email,
+    Employment,
+    Interview,
+    Request,
+    CompletedRequest,
 )
 from app.utils import generate_new_account_email, send_email
 
 router = APIRouter(prefix="/users", tags=["users"])
+
+
+def _delete_user_and_dependents(session: SessionDep, user: User) -> None:
+    """Delete a user along with all rows that reference it, so foreign-key
+    constraints don't block the delete (SQLite w/ FKs on, and Postgres)."""
+    session.exec(delete(Email).where(col(Email.user_id) == user.id))
+    session.exec(delete(Employment).where(col(Employment.user_id) == user.id))
+    session.exec(delete(Interview).where(col(Interview.user_id) == user.id))
+    session.exec(
+        delete(Request).where(
+            (col(Request.requester_id) == user.id)
+            | (col(Request.requested_id) == user.id)
+        )
+    )
+    session.exec(
+        delete(CompletedRequest).where(
+            (col(CompletedRequest.requester_id) == user.id)
+            | (col(CompletedRequest.requested_id) == user.id)
+        )
+    )
+    session.delete(user)
+    session.commit()
 
 @router.get(
     "/",
@@ -140,8 +166,7 @@ def delete_user_me(session: SessionDep, current_user: CurrentUser) -> Any:
         raise HTTPException(
             status_code=403, detail="Super users are not allowed to delete themselves"
         )
-    session.delete(current_user)
-    session.commit()
+    _delete_user_and_dependents(session, current_user)
     return Message(message="User deleted successfully")
 
 
@@ -236,8 +261,7 @@ def delete_user(
         raise HTTPException(
             status_code=403, detail="Super users are not allowed to delete themselves"
         )
-    session.delete(user)
-    session.commit()
+    _delete_user_and_dependents(session, user)
     return Message(message="User deleted successfully")
 
 

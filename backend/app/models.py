@@ -218,3 +218,31 @@ class TokenPayload(SQLModel):
 class NewPassword(SQLModel):
     token: str
     new_password: str = Field(min_length=8, max_length=40)
+
+
+# EMAIL OTP (passwordless login)
+class OTPCode(SQLModel, table=True):
+    """A one-time login code emailed to a user. The code itself is stored hashed."""
+    id: int | None = Field(default=None, primary_key=True)
+    email: str = Field(index=True)
+    hashed_code: str
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    expires_at: datetime
+    attempts: int = 0
+    used: bool = False
+
+
+class OTPRequest(SQLModel):
+    email: EmailStr
+
+
+class OTPVerify(SQLModel):
+    email: EmailStr
+    code: str = Field(min_length=6, max_length=6)
+
+
+class OTPRequestResponse(SQLModel):
+    message: str
+    # Only populated in local/dev (when email sending is disabled) so the flow
+    # is testable without a real SMTP server. Never populated in production.
+    dev_code: Optional[str] = None

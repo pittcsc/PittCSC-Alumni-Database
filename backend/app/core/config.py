@@ -101,6 +101,9 @@ class Settings(BaseSettings):
         return self
 
     EMAIL_RESET_TOKEN_EXPIRE_HOURS: int = 48
+    # Passwordless email one-time-code login
+    EMAIL_OTP_EXPIRE_MINUTES: int = 10
+    EMAIL_OTP_MAX_ATTEMPTS: int = 5
 
     @computed_field  # type: ignore[prop-decorator]
     @property
