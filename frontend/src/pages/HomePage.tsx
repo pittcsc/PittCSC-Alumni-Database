@@ -1,193 +1,152 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import {
-  ArrowRight,
-  Users,
-  Briefcase,
-  Network,
-  TrendingUp,
-  Award,
-  BookOpen,
-  Zap
-} from 'lucide-react';
+import { MapPin, ArrowRight } from 'lucide-react';
+import { userAPI } from '../services/api';
+import { AlumniPreview } from '../types';
 import Hero from '../components/home/Hero';
-import Card from '../components/ui/Card';
-import Button from '../components/ui/Button';
+
+// Real employers from the directory — shown as evidence, not decoration.
+const COMPANIES = [
+  'Anthropic', 'Google', 'Netflix', 'Roblox', 'AWS', 'Plaid',
+  'Descope', 'Sol Browser', 'Fragile', 'University of Maryland', 'Harvard',
+];
+
+const initials = (name: string | null) =>
+  (name || 'AL')
+    .split(' ')
+    .map((n) => n[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
+
+const helpsFor = (a: AlumniPreview) =>
+  [
+    a.open_to_coffee_chats && 'Coffee chats',
+    a.open_to_mentorship && 'Mentorship',
+    a.available_for_referrals && 'Referrals',
+    a.open_to_resume_review && 'Resume review',
+  ].filter(Boolean) as string[];
+
+const AlumCard: React.FC<{ alum: AlumniPreview }> = ({ alum }) => {
+  const helps = helpsFor(alum);
+  return (
+    <Link
+      to={`/alumni/${alum.id}`}
+      className="flex flex-col rounded-xl border border-gray-200 bg-white p-5 transition-shadow hover:shadow-md"
+    >
+      <div className="flex items-center gap-3">
+        <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full bg-pittNavy text-sm font-bold text-white">
+          {initials(alum.full_name)}
+        </div>
+        <div className="min-w-0">
+          <p className="truncate font-semibold text-pittDarkNavy">{alum.full_name}</p>
+          <p className="truncate text-sm text-gray-600">
+            {alum.current_role}
+            {alum.current_company ? ` · ${alum.current_company}` : ''}
+          </p>
+        </div>
+      </div>
+
+      <p className="mt-3 flex items-center gap-1 text-sm text-gray-500">
+        {alum.location && (
+          <>
+            <MapPin className="h-3.5 w-3.5" strokeWidth={1.75} />
+            {alum.location}
+          </>
+        )}
+        {alum.location && alum.graduation_year ? ' · ' : ''}
+        {alum.graduation_year && <span>Class of {alum.graduation_year}</span>}
+      </p>
+
+      {helps.length > 0 && (
+        <p className="mt-3 border-t border-gray-100 pt-3 text-sm">
+          <span className="text-gray-500">Can help with: </span>
+          <span className="text-pittNavy">{helps.join(' · ')}</span>
+        </p>
+      )}
+    </Link>
+  );
+};
 
 const HomePage: React.FC = () => {
+  const [alumni, setAlumni] = useState<AlumniPreview[]>([]);
+
+  useEffect(() => {
+    userAPI
+      .getPreview(12)
+      .then((data) => setAlumni(data))
+      .catch(() => setAlumni([]));
+  }, []);
+
   return (
     <div>
       <Hero />
-      
-      {/* Features Section */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-display font-bold text-pittDarkNavy mb-4">
-              Why Join Our Network?
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Connect with a vibrant community of PittCSC alumni and unlock opportunities for growth
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <FeatureCard
-              icon={<Users />}
-              title="Alumni Directory"
-              description="Browse profiles of successful alumni working at top tech companies worldwide"
-              color="text-pittNavy"
-              bgColor="bg-pittNavy/10"
-            />
-            <FeatureCard
-              icon={<Briefcase />}
-              title="Career Opportunities"
-              description="Get referrals and discover job openings through our alumni network"
-              color="text-pittGold"
-              bgColor="bg-pittGold/10"
-            />
-            <FeatureCard
-              icon={<Network />}
-              title="Mentorship Program"
-              description="Connect with experienced professionals for guidance and career advice"
-              color="text-green-600"
-              bgColor="bg-green-100"
-            />
-            <FeatureCard
-              icon={<BookOpen />}
-              title="Interview Prep"
-              description="Access interview experiences and tips from alumni at your target companies"
-              color="text-purple-600"
-              bgColor="bg-purple-100"
-            />
-            <FeatureCard
-              icon={<Award />}
-              title="Exclusive Events"
-              description="Attend alumni meetups, tech talks, and networking events"
-              color="text-red-600"
-              bgColor="bg-red-100"
-            />
-            <FeatureCard
-              icon={<TrendingUp />}
-              title="Career Growth"
-              description="Learn from alumni experiences and accelerate your professional development"
-              color="text-blue-600"
-              bgColor="bg-blue-100"
-            />
-          </div>
-        </div>
-      </section>
-      
-      {/* How It Works Section */}
-      <section className="py-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-display font-bold text-pittDarkNavy mb-4">
-              How It Works
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Get started with the PittCSC Alumni Network in three simple steps
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <StepCard
-              number="1"
-              title="Create Your Profile"
-              description="Sign up and complete your professional profile with your experience and interests"
-              icon={<Users />}
-            />
-            <StepCard
-              number="2"
-              title="Connect & Network"
-              description="Browse alumni profiles, send connection requests, and build your network"
-              icon={<Network />}
-            />
-            <StepCard
-              number="3"
-              title="Grow Together"
-              description="Engage with the community, share opportunities, and help each other succeed"
-              icon={<TrendingUp />}
-            />
-          </div>
-          
-          <div className="text-center mt-12">
-            <Link to="/register">
-              <Button size="lg" rightIcon={<ArrowRight className="h-5 w-5" />}>
-                Get Started Now
-              </Button>
+
+      {/* Alumni directory */}
+      <section className="bg-pittLight py-16">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
+            <h2 className="font-display text-3xl font-bold text-pittDarkNavy">Alumni directory</h2>
+            <Link
+              to="/alumni"
+              className="inline-flex items-center font-medium text-pittNavy hover:text-pittDeepNavy"
+            >
+              See all alumni
+              <ArrowRight className="ml-1 h-4 w-4" />
             </Link>
           </div>
+
+          {alumni.length === 0 ? (
+            <p className="text-gray-500">Loading alumni…</p>
+          ) : (
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {alumni.map((a) => (
+                <AlumCard key={a.id} alum={a} />
+              ))}
+            </div>
+          )}
         </div>
       </section>
-      
-      
-      {/* CTA Section */}
-      <section className="py-20 bg-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="bg-gradient-to-br from-pittGold/10 to-pittGold/5 rounded-2xl p-12 border border-pittGold/20">
-            <Zap className="h-12 w-12 text-pittGold mx-auto mb-6" />
-            <h2 className="text-3xl font-display font-bold text-pittDarkNavy mb-4">
-              Ready to Join the Network?
-            </h2>
-            <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
-              Connect with fellow PittCSC alumni and take your career to the next level. 
-              Registration is free and takes less than 5 minutes.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/register">
-                <Button size="lg" rightIcon={<ArrowRight />}>
-                  Create Your Profile
-                </Button>
-              </Link>
-              <Link to="/about">
-                <Button variant="outline" size="lg">
-                  Learn More
-                </Button>
-              </Link>
-            </div>
+
+      {/* Where alumni work */}
+      <section className="border-y border-gray-100 bg-white py-14">
+        <div className="mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
+          <h2 className="font-display text-2xl font-bold text-pittDarkNavy">
+            Where PittCSC alumni work
+          </h2>
+          <p className="mx-auto mt-2 max-w-2xl text-gray-600">
+            Browse the directory by company, role, or graduation year to find alumni who've been
+            through the recruiting process at companies you're interested in.
+          </p>
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-3">
+            {COMPANIES.map((c) => (
+              <span key={c} className="font-medium text-gray-700">
+                {c}
+              </span>
+            ))}
           </div>
+        </div>
+      </section>
+
+      {/* Connect with alumni */}
+      <section className="bg-pittNavy py-16 text-white">
+        <div className="mx-auto max-w-3xl px-4 text-center sm:px-6 lg:px-8">
+          <h2 className="font-display text-3xl font-bold">Connect with alumni</h2>
+          <p className="mx-auto mt-3 max-w-xl text-gray-300">
+            Sign in with your Pitt email to message alumni, ask questions, get recruiting advice, or
+            request a referral.
+          </p>
+          <Link
+            to="/login"
+            className="mt-8 inline-flex items-center rounded-lg bg-pittGold px-6 py-3 font-semibold text-pittDarkNavy transition-colors hover:bg-pittLightGold"
+          >
+            Sign in
+            <ArrowRight className="ml-2 h-5 w-5" />
+          </Link>
         </div>
       </section>
     </div>
   );
 };
-
-const FeatureCard: React.FC<{
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-  color: string;
-  bgColor: string;
-}> = ({ icon, title, description, color, bgColor }) => (
-  <Card hover className="text-center group">
-    <div className={`inline-flex p-4 rounded-full ${bgColor} mb-4 group-hover:scale-110 transition-transform`}>
-      {React.cloneElement(icon as React.ReactElement, { className: `h-8 w-8 ${color}` })}
-    </div>
-    <h3 className="text-xl font-semibold text-pittDarkNavy mb-2">{title}</h3>
-    <p className="text-gray-600">{description}</p>
-  </Card>
-);
-
-const StepCard: React.FC<{
-  number: string;
-  title: string;
-  description: string;
-  icon: React.ReactNode;
-}> = ({ number, title, description, icon }) => (
-  <div className="relative">
-    <div className="absolute -top-4 -left-4 w-12 h-12 bg-gradient-gold rounded-full flex items-center justify-center text-pittDarkNavy font-bold text-xl shadow-lg">
-      {number}
-    </div>
-    <Card className="pt-8">
-      <div className="flex justify-center mb-4 text-pittNavy">
-        {React.cloneElement(icon as React.ReactElement, { className: 'h-10 w-10' })}
-      </div>
-      <h3 className="text-xl font-semibold text-pittDarkNavy mb-2">{title}</h3>
-      <p className="text-gray-600">{description}</p>
-    </Card>
-  </div>
-);
-
 
 export default HomePage;

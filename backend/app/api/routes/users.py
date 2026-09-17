@@ -54,6 +54,36 @@ def _delete_user_and_dependents(session: SessionDep, user: User) -> None:
     session.delete(user)
     session.commit()
 
+
+# NOTE: declared before "/{user_id}" so "preview" isn't captured as a user id.
+@router.get("/preview")
+def preview_users(session: SessionDep, limit: int = 12) -> Any:
+    """Public landing-page teaser: a few visible, completed alumni profiles.
+    No auth, and contact details (email/LinkedIn) are intentionally omitted."""
+    users = session.exec(
+        select(User)
+        .where(User.profile_visible == True, User.profile_completed == True)  # noqa: E712
+        .order_by(col(User.graduation_year).desc())
+        .limit(min(limit, 24))
+    ).all()
+    return [
+        {
+            "id": u.id,
+            "full_name": u.full_name,
+            "current_role": u.current_role,
+            "current_company": u.current_company,
+            "graduation_year": u.graduation_year,
+            "location": u.location,
+            "profile_image": u.profile_image,
+            "open_to_coffee_chats": u.open_to_coffee_chats,
+            "open_to_mentorship": u.open_to_mentorship,
+            "available_for_referrals": u.available_for_referrals,
+            "open_to_resume_review": u.open_to_resume_review,
+        }
+        for u in users
+    ]
+
+
 @router.get(
     "/",
     response_model=UsersPublic

@@ -1,8 +1,12 @@
-"""Seed the database with realistic demo alumni, employment, and interview data.
+"""Seed the database with demo alumni for the directory.
 
 Run from the backend directory:  ./venv/bin/python -m scripts.seed_demo
 
 Idempotent: skips users that already exist. Safe to re-run.
+
+Note: these are real PittCSC alumni names with their public role/company. We do
+NOT fabricate interview histories or bios for them — those are left empty for the
+real person to fill in. Graduation years / locations are best-effort placeholders.
 """
 from datetime import datetime, timezone
 
@@ -14,7 +18,6 @@ from app.models import (
     Company,
     Email,
     Employment,
-    Interview,
     User,
     UserCreate,
 )
@@ -26,21 +29,17 @@ def _logo(domain: str) -> str:
 
 # name -> logo domain
 COMPANIES = {
-    "Coinbase": "coinbase.com",
-    "Vanguard": "vanguard.com",
-    "Lockheed Martin": "lockheedmartin.com",
-    "NVIDIA": "nvidia.com",
-    "Palantir": "palantir.com",
-    "Circle": "circle.com",
-    "Google": "google.com",
-    "Meta": "meta.com",
-    "Stripe": "stripe.com",
-    "Databricks": "databricks.com",
-    "Amazon": "amazon.com",
-    "Microsoft": "microsoft.com",
-    "Duolingo": "duolingo.com",
-    "Two Sigma": "twosigma.com",
     "Anthropic": "anthropic.com",
+    "Google": "google.com",
+    "Netflix": "netflix.com",
+    "Roblox": "roblox.com",
+    "AWS": "aws.amazon.com",
+    "Plaid": "plaid.com",
+    "Descope": "descope.com",
+    "Sol Browser": "solbrowser.com",
+    "Fragile": "fragile.dev",
+    "University of Maryland": "umd.edu",
+    "Harvard": "harvard.edu",
 }
 
 
@@ -48,121 +47,92 @@ def _d(year: int, month: int = 6, day: int = 1) -> datetime:
     return datetime(year, month, day, tzinfo=timezone.utc)
 
 
-# Each alum: profile dict, employment [(company, type, start, end)], interviews [(company, role, internship, season_year, passed, note)]
+# Each alum: profile dict + employment [(company, type, start, end)].
+# interviews are intentionally empty for real people (not fabricated).
 ALUMNI = [
     {
-        "email": "shreyash@pitt.edu",
-        "password": "pittcsc2025",
-        "full_name": "Shreyash Ranjan",
-        "profile": dict(
-            location="San Francisco, CA",
-            graduation_year=2026,
-            linkedin_url="https://linkedin.com/in/shreyashranjan",
-            current_company="NVIDIA",
-            current_role="Software Engineer",
-            bio="CS @ Pitt. Interested in AI infra + crypto. Happy to help with interview prep and referrals.",
-            open_to_coffee_chats=True,
-            open_to_mentorship=True,
-            available_for_referrals=True,
-            is_alumni=True,
-            profile_completed=True,
-        ),
-        "employment": [
-            ("Coinbase", "internship", _d(2023), _d(2023, 8)),
-            ("Vanguard", "internship", _d(2024), _d(2024, 8)),
-            ("Lockheed Martin", "internship", _d(2022), _d(2022, 8)),
-            ("NVIDIA", "full time", _d(2026), None),
-        ],
-        "interviews": [
-            ("Palantir", "Software Engineer", True, 2024, False, "Onsite: 2 coding + 1 system design. Great people."),
-            ("Circle", "Backend Engineer", True, 2024, True, "Take-home + 2 rounds. Crypto-heavy."),
-            ("Google", "SWE Intern", True, 2023, False, "Phone screen graph + DP. Rejected after onsite."),
-            ("Meta", "Production Engineer", True, 2023, True, "2 coding + 1 systems. Fast process."),
-        ],
+        "email": "richie.goulazian@pitt.edu", "full_name": "Richie Goulazian",
+        "profile": dict(location="San Francisco, CA", graduation_year=2022,
+            current_company="Anthropic", current_role="Member of Technical Staff",
+            open_to_coffee_chats=True, open_to_mentorship=True, available_for_referrals=True),
+        "company": "Anthropic", "since": 2022,
     },
     {
-        "email": "maya.chen@pitt.edu",
-        "password": "pittcsc2025",
-        "full_name": "Maya Chen",
-        "profile": dict(
-            location="Seattle, WA",
-            graduation_year=2024,
-            linkedin_url="https://linkedin.com/in/mayachen",
-            current_company="Microsoft",
-            current_role="Product Manager",
-            bio="APM @ Microsoft. Former Pitt CSC board. Love mentoring underclassmen on PM breaking-in.",
-            open_to_coffee_chats=True,
-            open_to_mentorship=True,
-            available_for_referrals=False,
-            is_alumni=True,
-            profile_completed=True,
-        ),
-        "employment": [
-            ("Amazon", "internship", _d(2023), _d(2023, 8)),
-            ("Microsoft", "full time", _d(2024), None),
-        ],
-        "interviews": [
-            ("Google", "APM", False, 2024, False, "Product sense + analytical. Tough final round."),
-            ("Stripe", "PM", False, 2024, True, "Loved the user-empathy focus."),
-        ],
+        "email": "ritwik.gupta@pitt.edu", "full_name": "Ritwik Gupta",
+        "profile": dict(location="College Park, MD", graduation_year=2016,
+            current_company="University of Maryland", current_role="Assistant Professor",
+            open_to_mentorship=True, open_to_resume_review=True),
+        "company": "University of Maryland", "since": 2016,
     },
     {
-        "email": "deshawn.brooks@pitt.edu",
-        "password": "pittcsc2025",
-        "full_name": "DeShawn Brooks",
-        "profile": dict(
-            location="New York, NY",
-            graduation_year=2023,
-            linkedin_url="https://linkedin.com/in/deshawnbrooks",
-            current_company="Two Sigma",
-            current_role="Quant Developer",
-            bio="Quant dev @ Two Sigma. Ask me about finance interviews and low-latency systems.",
-            open_to_coffee_chats=False,
-            open_to_mentorship=True,
-            available_for_referrals=True,
-            is_alumni=True,
-            profile_completed=True,
-        ),
-        "employment": [
-            ("Two Sigma", "full time", _d(2023), None),
-        ],
-        "interviews": [
-            ("Databricks", "Software Engineer", False, 2023, True, "Spark internals + coding."),
-            ("Palantir", "Forward Deployed Engineer", False, 2022, True, "Very applied, real dataset."),
-        ],
+        "email": "quentin.romerolauro@pitt.edu", "full_name": "Quentin Romero Lauro",
+        "profile": dict(location="San Francisco, CA", graduation_year=2023,
+            current_company="Sol Browser", current_role="Co-Founder & CEO",
+            open_to_coffee_chats=True, open_to_mentorship=True),
+        "company": "Sol Browser", "since": 2024,
     },
     {
-        "email": "priya.patel@pitt.edu",
-        "password": "pittcsc2025",
-        "full_name": "Priya Patel",
-        "profile": dict(
-            location="Pittsburgh, PA",
-            graduation_year=2025,
-            linkedin_url="https://linkedin.com/in/priyapatel",
-            current_company="Duolingo",
-            current_role="ML Engineer",
-            bio="ML @ Duolingo (stayed in Pittsburgh!). Happy to chat about ML interviews and staying local.",
-            open_to_coffee_chats=True,
-            open_to_mentorship=False,
-            available_for_referrals=True,
-            is_alumni=True,
-            profile_completed=True,
-        ),
-        "employment": [
-            ("Duolingo", "internship", _d(2024), _d(2024, 8)),
-            ("Duolingo", "full time", _d(2025), None),
-        ],
-        "interviews": [
-            ("Anthropic", "ML Engineer", False, 2025, False, "Deep ML + coding. Learned a ton."),
-            ("Meta", "ML Engineer", False, 2024, True, "ML system design was the differentiator."),
-        ],
+        "email": "nij.patel@pitt.edu", "full_name": "Nij Patel",
+        "profile": dict(location="New York, NY", graduation_year=2024,
+            current_company="Fragile", current_role="Engineer",
+            open_to_coffee_chats=True, available_for_referrals=True),
+        "company": "Fragile", "since": 2024,
+    },
+    {
+        "email": "brayden.nguyen@pitt.edu", "full_name": "Brayden Nguyen",
+        "profile": dict(location="San Mateo, CA", graduation_year=2024,
+            current_company="Roblox", current_role="Software Engineer",
+            open_to_coffee_chats=True, open_to_mentorship=True, open_to_resume_review=True),
+        "company": "Roblox", "since": 2024,
+    },
+    {
+        "email": "olivia.wininsky@pitt.edu", "full_name": "Olivia Wininsky",
+        "profile": dict(location="Cambridge, MA", graduation_year=2023,
+            current_company="Harvard", current_role="Investor",
+            open_to_coffee_chats=True, open_to_mentorship=True),
+        "company": "Harvard", "since": 2023,
+    },
+    {
+        "email": "rachel.jan@pitt.edu", "full_name": "Rachel Jan",
+        "profile": dict(location="New York, NY", graduation_year=2023,
+            current_company="Plaid", current_role="Software Engineer",
+            open_to_coffee_chats=True, available_for_referrals=True, open_to_resume_review=True),
+        "company": "Plaid", "since": 2023,
+    },
+    {
+        "email": "delaney.scheidell@pitt.edu", "full_name": "Delaney Scheidell",
+        "profile": dict(location="Seattle, WA", graduation_year=2024,
+            current_company="AWS", current_role="Frontend Engineer",
+            open_to_coffee_chats=True, open_to_resume_review=True),
+        "company": "AWS", "since": 2024,
+    },
+    {
+        "email": "michael.henry@pitt.edu", "full_name": "Michael LJ Henry",
+        "profile": dict(location="Los Gatos, CA", graduation_year=2022,
+            current_company="Netflix", current_role="Software Engineer",
+            open_to_mentorship=True, available_for_referrals=True),
+        "company": "Netflix", "since": 2022,
+    },
+    {
+        "email": "julian.alamorosas@pitt.edu", "full_name": "Julian Alamo-Rosas",
+        "profile": dict(location="Mountain View, CA", graduation_year=2023,
+            current_company="Google", current_role="Software Engineer",
+            open_to_coffee_chats=True, available_for_referrals=True),
+        "company": "Google", "since": 2023,
+    },
+    {
+        "email": "rohit.ganguly@pitt.edu", "full_name": "Rohit Ganguly",
+        "profile": dict(location="Los Altos, CA", graduation_year=2024,
+            current_company="Descope", current_role="Product Manager",
+            open_to_coffee_chats=True, open_to_mentorship=True, open_to_resume_review=True),
+        "company": "Descope", "since": 2024,
     },
 ]
 
 
 def seed() -> None:
     with Session(engine) as session:
-        # Companies first (FK target for employment + interviews)
+        # Companies first (FK target for employment)
         for name, domain in COMPANIES.items():
             if not session.get(Company, name):
                 session.add(Company(name=name, image_url=_logo(domain)))
@@ -180,39 +150,26 @@ def seed() -> None:
                 session=session,
                 user_create=UserCreate(
                     email=alum["email"],
-                    password=alum["password"],
+                    password="pittcsc2025",
                     full_name=alum["full_name"],
                 ),
             )
-            # apply profile fields
             for k, v in alum["profile"].items():
                 setattr(user, k, v)
+            user.is_alumni = True
+            user.profile_completed = True
             session.add(user)
             session.add(Email(email=user.email, preferred=True, user_id=user.id))
 
-            for company, etype, start, end in alum["employment"]:
-                session.add(
-                    Employment(
-                        user_id=user.id,
-                        company_name=company,
-                        type=etype,
-                        start=start,
-                        end=end,
-                    )
+            session.add(
+                Employment(
+                    user_id=user.id,
+                    company_name=alum["company"],
+                    type="full time",
+                    start=_d(alum["since"]),
+                    end=None,
                 )
-            for company, role, internship, season_year, passed, note in alum["interviews"]:
-                session.add(
-                    Interview(
-                        user_id=user.id,
-                        company_name=company,
-                        role=role,
-                        internship=internship,
-                        season=_d(season_year),
-                        passed=passed,
-                        note=note,
-                        date=_d(season_year),
-                    )
-                )
+            )
             session.commit()
             print(f"seeded: {alum['full_name']} ({alum['email']})")
 

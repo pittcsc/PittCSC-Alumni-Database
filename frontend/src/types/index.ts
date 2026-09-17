@@ -49,6 +49,21 @@ export interface UserUpdate {
   profile_visible?: boolean;
 }
 
+// Public landing-page preview of an alum (no contact details)
+export interface AlumniPreview {
+  id: number;
+  full_name: string | null;
+  current_role?: string | null;
+  current_company?: string | null;
+  graduation_year?: number | null;
+  location?: string | null;
+  profile_image?: string | null;
+  open_to_coffee_chats: boolean;
+  open_to_mentorship: boolean;
+  available_for_referrals: boolean;
+  open_to_resume_review: boolean;
+}
+
 // Company Types
 export interface Company {
   name: string;
