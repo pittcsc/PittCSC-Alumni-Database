@@ -55,6 +55,14 @@ def send_email(
     logger.info(f"send email result: {response}")
 
 
+def generate_test_email(email_to: str) -> EmailData:
+    project_name = settings.PROJECT_NAME
+    subject = f"{project_name} - Test email"
+    html_content = render_email_template(
+        template_name="test_email.html",
+        context={"project_name": settings.PROJECT_NAME, "email": email_to},
+    )
+    return EmailData(html_content=html_content, subject=subject)
 
 
 def generate_reset_password_email(email_to: str, email: str, token: str) -> EmailData:
@@ -89,6 +97,20 @@ def generate_new_account_email(
             "link": settings.FRONTEND_HOST,
         },
     )
+    return EmailData(html_content=html_content, subject=subject)
+
+
+def generate_otp_email(email_to: str, code: str, valid_minutes: int) -> EmailData:
+    project_name = settings.PROJECT_NAME
+    subject = f"{project_name} - Your login code is {code}"
+    html_content = f"""
+    <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;max-width:480px;margin:0 auto;padding:24px;color:#1a1a1a;">
+      <h2 style="color:#1d2758;margin-bottom:4px;">{project_name}</h2>
+      <p style="color:#444;">Use this one-time code to sign in:</p>
+      <p style="font-size:32px;font-weight:700;letter-spacing:8px;color:#1d2758;background:#f6f7f9;padding:16px;text-align:center;border-radius:8px;margin:16px 0;">{code}</p>
+      <p style="color:#666;font-size:14px;">This code expires in {valid_minutes} minutes. If you didn't request it, you can safely ignore this email.</p>
+    </div>
+    """
     return EmailData(html_content=html_content, subject=subject)
 
 

@@ -1,35 +1,23 @@
-FROM python:3.11-slim
+FROM python:3.12-slim
 
-# Set working directory
 WORKDIR /app
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    gcc \
+# System deps needed to build psycopg2 / bcrypt wheels
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements first for better caching
+# Install Python deps first for better layer caching
 COPY requirements.txt .
-
-# Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy application code
+# App code
 COPY . .
 
-# Make startup script executable
-RUN chmod +x scripts/startup.sh
-
-# Expose port
-EXPOSE 8000
-
-# Create non-root user
+# Non-root user
 RUN useradd -m -u 1000 appuser && chown -R appuser:appuser /app
 USER appuser
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
-    CMD python -c "import requests; requests.get('http://localhost:8000/api/v1/utils/health-check/')"
-
-# Run the application
-CMD ["./scripts/startup.sh"]
+# Render (and most PaaS) inject $PORT; default to 8000 for local `docker run`.
+EXPOSE 8000
+CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]

@@ -28,7 +28,7 @@ const AlumniListPage: React.FC = () => {
   
   const navigate = useNavigate();
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  
+
   // Compute unique values for filters
   const filterOptions = useMemo(() => {
     const locations = new Set<string>();
@@ -61,18 +61,18 @@ const AlumniListPage: React.FC = () => {
       // navigate('/login');
       // return;
     }
-
+    
     // Fetch alumni data
     fetchAlumni(currentPage);
-  }, [currentPage, isAuthenticated, fetchAlumni]);
+  }, [currentPage]);
   
   const handleConnect = (alumniId: number) => {
     if (!isAuthenticated) {
       navigate('/login');
       return;
     }
-    // Connection functionality would be implemented here
-    console.log('Connect with alumni:', alumniId);
+    // Connection requests are sent from the alumni detail page.
+    navigate(`/alumni/${alumniId}`);
   };
   
   const handlePageChange = (page: number) => {
@@ -108,7 +108,7 @@ const AlumniListPage: React.FC = () => {
             Alumni Directory
           </h1>
           <p className="text-lg text-gray-600">
-            Connect with Pitt CSC alumni from around the world
+            Connect with PittCSC alumni from around the world
           </p>
         </div>
         

@@ -27,6 +27,7 @@ class UserRegister(SQLModel):
 class UserUpdate(UserBase):
     full_name: Optional[str] = Field(default=None, max_length=255)
     email: Optional[EmailStr] = Field(default=None, max_length=255)  # type: ignore
+    location: Optional[str] = None
     graduation_year: Optional[int] = None
     linkedin_url: Optional[str] = None
     personal_website: Optional[str] = None
@@ -36,13 +37,17 @@ class UserUpdate(UserBase):
     open_to_coffee_chats: bool = False
     open_to_mentorship: bool = False
     available_for_referrals: bool = False
+    open_to_resume_review: bool = False
     bio: Optional[str] = None
     is_alumni: Optional[bool] = False
+    profile_visible: Optional[bool] = None
+    profile_completed: Optional[bool] = None
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class UserUpdateMe(SQLModel):
     full_name: Optional[str] = Field(default=None, max_length=255)
     email: Optional[EmailStr] = Field(default=None, max_length=255)
+    location: Optional[str] = None
     graduation_year: Optional[int] = None
     linkedin_url: Optional[str] = None
     personal_website: Optional[str] = None
@@ -52,8 +57,11 @@ class UserUpdateMe(SQLModel):
     open_to_coffee_chats: bool = False
     open_to_mentorship: bool = False
     available_for_referrals: bool = False
+    open_to_resume_review: bool = False
     bio: Optional[str] = None
     is_alumni: Optional[bool] = False
+    profile_visible: Optional[bool] = None
+    profile_completed: Optional[bool] = None
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class UpdatePassword(SQLModel):
@@ -77,6 +85,7 @@ class User(UserBase, table=True):
     open_to_coffee_chats: bool = False
     open_to_mentorship: bool = False
     available_for_referrals: bool = False
+    open_to_resume_review: bool = False
     bio: Optional[str] = None
     is_alumni: bool = False
     profile_completed: bool = False
@@ -95,9 +104,11 @@ class UserPublic(UserBase):
     open_to_coffee_chats: Optional[bool]
     open_to_mentorship: Optional[bool]
     available_for_referrals: Optional[bool]
+    open_to_resume_review: Optional[bool]
     bio: Optional[str]
     is_alumni: Optional[bool]
     profile_visible: Optional[bool]
+    profile_completed: Optional[bool]
 
 class UsersPublic(SQLModel):
     data: list[UserPublic]
@@ -125,18 +136,6 @@ class Company(SQLModel, table=True):
 
 class CompaniesPublic(SQLModel):
     data: list[Company]
-    count: int
-
-# INTERNSHIPS
-class Internship(SQLModel, table=True):
-    id: int | None = Field(default=None, primary_key=True)
-    user_id: int = Field(foreign_key="user.id", nullable=False)
-    company_name: str = Field(foreign_key="company.name")
-    season: datetime = None
-    length: int = 10 # Weeks
-
-class InternshipsPublic(SQLModel):
-    data: list[Internship]
     count: int
 
 # INTERVIEWS
@@ -200,17 +199,6 @@ class CompletedRequest(SQLModel, table=True):
     requester_id: int = Field(foreign_key="user.id", nullable=False)
     requested_id: int = Field(foreign_key="user.id", nullable=False)
 
-# EVENTS
-class Event(SQLModel, table=True):
-    id: int | None = Field(default=None, primary_key=True)
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-    title: str = Field(max_length=255)
-    description: str
-    date: datetime
-    location: str
-    image_url: Optional[str] = None
-
-
 # # Generic message
 class Message(SQLModel):
     message: str
@@ -230,3 +218,31 @@ class TokenPayload(SQLModel):
 class NewPassword(SQLModel):
     token: str
     new_password: str = Field(min_length=8, max_length=40)
+
+
+# EMAIL OTP (passwordless login)
+class OTPCode(SQLModel, table=True):
+    """A one-time login code emailed to a user. The code itself is stored hashed."""
+    id: int | None = Field(default=None, primary_key=True)
+    email: str = Field(index=True)
+    hashed_code: str
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    expires_at: datetime
+    attempts: int = 0
+    used: bool = False
+
+
+class OTPRequest(SQLModel):
+    email: EmailStr
+
+
+class OTPVerify(SQLModel):
+    email: EmailStr
+    code: str = Field(min_length=6, max_length=6)
+
+
+class OTPRequestResponse(SQLModel):
+    message: str
+    # Only populated in local/dev (when email sending is disabled) so the flow
+    # is testable without a real SMTP server. Never populated in production.
+    dev_code: Optional[str] = None

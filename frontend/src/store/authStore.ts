@@ -11,6 +11,8 @@ interface AuthState {
   
   // Actions
   login: (username: string, password: string) => Promise<void>;
+  requestOtp: (email: string) => Promise<{ message: string; dev_code?: string | null }>;
+  loginWithOtp: (email: string, code: string) => Promise<void>;
   register: (email: string, password: string, fullName: string) => Promise<void>;
   logout: () => Promise<void>;
   fetchCurrentUser: () => Promise<void>;
@@ -37,13 +39,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       await get().fetchCurrentUser();
       
       set({ isAuthenticated: true });
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error && 'response' in error
-        ? (error as any).response?.data?.detail || 'Login failed'
-        : 'Login failed';
-      set({
-        error: errorMessage,
-        isAuthenticated: false
+    } catch (error: any) {
+      set({ 
+        error: error.response?.data?.detail || 'Login failed',
+        isAuthenticated: false 
       });
       throw error;
     } finally {
@@ -51,6 +50,36 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
   },
   
+  requestOtp: async (email: string) => {
+    try {
+      set({ isLoading: true, error: null });
+      return await authAPI.requestOtp(email);
+    } catch (error: any) {
+      set({ error: error.response?.data?.detail || 'Could not send login code' });
+      throw error;
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
+  loginWithOtp: async (email: string, code: string) => {
+    try {
+      set({ isLoading: true, error: null });
+      const response = await authAPI.verifyOtp(email, code);
+      set({ accessToken: response.access_token });
+      await get().fetchCurrentUser();
+      set({ isAuthenticated: true });
+    } catch (error: any) {
+      set({
+        error: error.response?.data?.detail || 'Invalid or expired code',
+        isAuthenticated: false,
+      });
+      throw error;
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
   register: async (email: string, password: string, fullName: string) => {
     try {
       set({ isLoading: true, error: null });
@@ -59,12 +88,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       
       // Auto-login after registration
       await get().login(email, password);
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error && 'response' in error
-        ? (error as any).response?.data?.detail || 'Registration failed'
-        : 'Registration failed';
-      set({
-        error: errorMessage
+    } catch (error: any) {
+      set({ 
+        error: error.response?.data?.detail || 'Registration failed' 
       });
       throw error;
     } finally {
@@ -83,11 +109,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         accessToken: null,
         isAuthenticated: false 
       });
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error && 'response' in error
-        ? (error as any).response?.data?.detail || 'Logout failed'
-        : 'Logout failed';
-      set({ error: errorMessage });
+    } catch (error: any) {
+      set({ error: error.response?.data?.detail || 'Logout failed' });
     } finally {
       set({ isLoading: false });
     }

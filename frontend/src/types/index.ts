@@ -5,20 +5,21 @@ export interface User {
   full_name: string;
   is_active: boolean;
   is_superuser: boolean;
-  location?: string | null;
-  graduation_year?: number | null;
-  linkedin_url?: string | null;
-  personal_website?: string | null;
-  current_company?: string | null;
-  current_role?: string | null;
-  profile_image?: string | null;
+  location?: string;
+  graduation_year?: number;
+  linkedin_url?: string;
+  personal_website?: string;
+  current_company?: string;
+  current_role?: string;
+  profile_image?: string;
   open_to_coffee_chats: boolean;
   open_to_mentorship: boolean;
   available_for_referrals: boolean;
-  bio?: string | null;
+  open_to_resume_review: boolean;
+  bio?: string;
   is_alumni: boolean;
   profile_visible: boolean;
-  profile_completed?: boolean;
+  profile_completed: boolean;
   created_at?: string;
   updated_at?: string;
 }
@@ -42,9 +43,25 @@ export interface UserUpdate {
   open_to_coffee_chats?: boolean;
   open_to_mentorship?: boolean;
   available_for_referrals?: boolean;
+  open_to_resume_review?: boolean;
   bio?: string;
   is_alumni?: boolean;
   profile_visible?: boolean;
+}
+
+// Public landing-page preview of an alum (no contact details)
+export interface AlumniPreview {
+  id: number;
+  full_name: string | null;
+  current_role?: string | null;
+  current_company?: string | null;
+  graduation_year?: number | null;
+  location?: string | null;
+  profile_image?: string | null;
+  open_to_coffee_chats: boolean;
+  open_to_mentorship: boolean;
+  available_for_referrals: boolean;
+  open_to_resume_review: boolean;
 }
 
 // Company Types
@@ -68,9 +85,8 @@ export interface Interview {
   internship: boolean;
   season: string;
   passed: boolean;
-  round?: number;
-  tips?: string;
-  overview?: string;
+  note?: string;
+  date?: string;
 }
 
 // Employment Types
@@ -123,6 +139,7 @@ export interface AlumniFilters {
   open_to_coffee_chats?: boolean;
   open_to_mentorship?: boolean;
   available_for_referrals?: boolean;
+  open_to_resume_review?: boolean;
   is_alumni?: boolean;
 }
 
@@ -140,5 +157,6 @@ export interface ProfileFormData {
   open_to_coffee_chats: boolean;
   open_to_mentorship: boolean;
   available_for_referrals: boolean;
+  open_to_resume_review: boolean;
   profile_visible: boolean;
 }

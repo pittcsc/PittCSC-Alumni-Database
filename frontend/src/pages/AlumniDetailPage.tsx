@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { useConnectionStore } from '../store/connectionStore';
 import { userAPI } from '../services/api';
-import { MapPin, Briefcase, Calendar, Award, Linkedin, Globe, ArrowLeft, CheckCircle } from 'lucide-react';
+import { MapPin, Briefcase, Calendar, Linkedin, Globe, ArrowLeft } from 'lucide-react';
 import Button from '../components/Button';
 import ConnectionRequestModal from '../components/ConnectionRequestModal';
 import { User } from '../types';
@@ -20,18 +20,26 @@ const AlumniDetailPage: React.FC = () => {
   const [showConnectionModal, setShowConnectionModal] = useState(false);
 
   useEffect(() => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+
     const fetchAlumni = async () => {
       try {
         setIsLoading(true);
+        setError(null);
 
         if (!id) {
           throw new Error('Alumni ID is required');
         }
 
-        const alumniData = await userAPI.getUserById(parseInt(id));
+        const alumniData = await userAPI.getUserById(Number(id));
         setAlumni(alumniData);
-      } catch (error: unknown) {
-        const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      } catch (err: unknown) {
+        const errorMessage =
+          (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail ||
+          (err instanceof Error ? err.message : 'Unknown error occurred');
         setError(errorMessage);
       } finally {
         setIsLoading(false);
@@ -39,7 +47,7 @@ const AlumniDetailPage: React.FC = () => {
     };
 
     fetchAlumni();
-  }, [id, navigate]);
+  }, [id, user, navigate]);
 
   const handleRequestConnection = () => {
     setShowConnectionModal(true);
@@ -55,8 +63,8 @@ const AlumniDetailPage: React.FC = () => {
       await createConnectionRequest(user.id, alumni.id, message);
       setShowConnectionModal(false);
       alert('Connection request sent successfully!');
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
       alert(`Error sending connection request: ${errorMessage}`);
     }
   };
@@ -79,10 +87,7 @@ const AlumniDetailPage: React.FC = () => {
           <div className="bg-white rounded-lg shadow-md p-8 text-center">
             <h2 className="text-2xl font-bold text-pittDeepNavy mb-4">Error</h2>
             <p className="text-gray-600 mb-6">{error}</p>
-            <Button
-              variant="primary"
-              onClick={() => navigate('/alumni')}
-            >
+            <Button variant="primary" onClick={() => navigate('/alumni')}>
               Back to Alumni List
             </Button>
           </div>
@@ -98,10 +103,7 @@ const AlumniDetailPage: React.FC = () => {
           <div className="bg-white rounded-lg shadow-md p-8 text-center">
             <h2 className="text-2xl font-bold text-pittDeepNavy mb-4">Alumni Not Found</h2>
             <p className="text-gray-600 mb-6">The alumni profile you're looking for could not be found.</p>
-            <Button
-              variant="primary"
-              onClick={() => navigate('/alumni')}
-            >
+            <Button variant="primary" onClick={() => navigate('/alumni')}>
               Back to Alumni List
             </Button>
           </div>
@@ -151,8 +153,12 @@ const AlumniDetailPage: React.FC = () => {
                   </div>
                   <div>
                     <h2 className="text-2xl font-bold text-pittDeepNavy">{alumni.full_name}</h2>
-                    {alumni.current_role && alumni.current_company && (
-                      <p className="text-gray-600">{alumni.current_role} at {alumni.current_company}</p>
+                    {(alumni.current_role || alumni.current_company) && (
+                      <p className="text-gray-600">
+                        {alumni.current_role}
+                        {alumni.current_role && alumni.current_company ? ' at ' : ''}
+                        {alumni.current_company}
+                      </p>
                     )}
                   </div>
                 </div>
@@ -169,6 +175,17 @@ const AlumniDetailPage: React.FC = () => {
                     <div className="flex items-center text-gray-600">
                       <Calendar className="h-5 w-5 mr-2 text-pittNavy" />
                       <span>Class of {alumni.graduation_year}</span>
+                    </div>
+                  )}
+
+                  {(alumni.current_role || alumni.current_company) && (
+                    <div className="flex items-center text-gray-600">
+                      <Briefcase className="h-5 w-5 mr-2 text-pittNavy" />
+                      <span>
+                        {alumni.current_role}
+                        {alumni.current_role && alumni.current_company ? ' at ' : ''}
+                        {alumni.current_company}
+                      </span>
                     </div>
                   )}
 
@@ -222,47 +239,25 @@ const AlumniDetailPage: React.FC = () => {
                         {alumni.available_for_referrals ? 'Available for' : 'Not available for'} Referrals
                       </span>
                     </div>
+                    <div className="flex items-center">
+                      <div className={`w-3 h-3 rounded-full mr-2 ${alumni.open_to_resume_review ? 'bg-green-500' : 'bg-gray-300'}`}></div>
+                      <span className={alumni.open_to_resume_review ? 'text-gray-800' : 'text-gray-500'}>
+                        {alumni.open_to_resume_review ? 'Open to' : 'Not available for'} Resume Review
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
 
               <div className="md:w-2/3">
-                {alumni.current_company && alumni.current_role && (
-                  <div className="bg-pittLight rounded-lg p-6 mb-6">
-                    <h3 className="text-lg font-semibold text-pittDeepNavy mb-4">Current Position</h3>
-                    <div className="flex items-start">
-                      <Briefcase className="h-5 w-5 mr-2 text-pittNavy flex-shrink-0 mt-0.5" />
-                      <div>
-                        <p className="font-medium">{alumni.current_role}</p>
-                        <p className="text-gray-600">{alumni.current_company}</p>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
                 <div className="bg-pittLight rounded-lg p-6 mb-6">
-                  <h3 className="text-lg font-semibold text-pittDeepNavy mb-4">Education</h3>
-                  <div className="space-y-2">
-                    {alumni.graduation_year ? (
-                      <div className="flex items-start">
-                        <Award className="h-5 w-5 mr-2 text-pittNavy flex-shrink-0 mt-0.5" />
-                        <div>
-                          <p className="font-medium">University of Pittsburgh</p>
-                          <p className="text-gray-500 text-sm">Class of {alumni.graduation_year}</p>
-                        </div>
-                      </div>
-                    ) : (
-                      <p className="text-gray-500">No education information available</p>
-                    )}
-                  </div>
-                </div>
-
-                {alumni.bio && (
-                  <div className="bg-pittLight rounded-lg p-6">
-                    <h3 className="text-lg font-semibold text-pittDeepNavy mb-4">Bio</h3>
+                  <h3 className="text-lg font-semibold text-pittDeepNavy mb-4">About</h3>
+                  {alumni.bio ? (
                     <p className="text-gray-600">{alumni.bio}</p>
-                  </div>
-                )}
+                  ) : (
+                    <p className="text-gray-500">No bio available</p>
+                  )}
+                </div>
               </div>
             </div>
           </div>

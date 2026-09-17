@@ -1,21 +1,17 @@
+# Netlify config for the PittCSC Alumni frontend (static SPA).
+# The backend is hosted separately on Render; the frontend talks to it via the
+# VITE_API_URL env var (set in Netlify → Site settings → Environment variables),
+# e.g. https://pittcsc-alumni-api.onrender.com/api/v1
+
 [build]
-  # Directory to change to before starting a build
-  base = "frontend/"
-
-  # Directory that contains the deploy-ready HTML files and assets
-  publish = "frontend/dist/"
-
-  # Default build command
+  base = "frontend"          # run the build from ./frontend
+  publish = "dist"           # frontend/dist (relative to base)
   command = "npm run build"
 
 [build.environment]
-  # Node.js version
-  NODE_VERSION = "18"
+  NODE_VERSION = "20"
 
-  # npm version
-  NPM_VERSION = "9"
-
-# Redirect rules for SPA routing
+# SPA routing: serve index.html for any client-side route
 [[redirects]]
   from = "/*"
   to = "/index.html"
@@ -26,26 +22,12 @@
   for = "/*"
   [headers.values]
     X-Frame-Options = "DENY"
-    X-XSS-Protection = "1; mode=block"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
     Permissions-Policy = "camera=(), microphone=(), geolocation=()"
 
-# Cache static assets
+# Long-cache hashed static assets
 [[headers]]
   for = "/assets/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
-
-# API proxy rules (if using Netlify Functions)
-[[redirects]]
-  from = "/api/*"
-  to = "/.netlify/functions/:splat"
-  status = 200
-
-# Development server settings
-[dev]
-  command = "npm run dev"
-  port = 5173
-  targetPort = 5173
-  publish = "frontend/dist"

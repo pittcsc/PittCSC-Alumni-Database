@@ -22,11 +22,67 @@ from app.models import (
     UpdatePassword,
     EmailBase,
     EmailsPublic,
-    Email
+    Email,
+    Employment,
+    Interview,
+    Request,
+    CompletedRequest,
 )
 from app.utils import generate_new_account_email, send_email
 
 router = APIRouter(prefix="/users", tags=["users"])
+
+
+def _delete_user_and_dependents(session: SessionDep, user: User) -> None:
+    """Delete a user along with all rows that reference it, so foreign-key
+    constraints don't block the delete (SQLite w/ FKs on, and Postgres)."""
+    session.exec(delete(Email).where(col(Email.user_id) == user.id))
+    session.exec(delete(Employment).where(col(Employment.user_id) == user.id))
+    session.exec(delete(Interview).where(col(Interview.user_id) == user.id))
+    session.exec(
+        delete(Request).where(
+            (col(Request.requester_id) == user.id)
+            | (col(Request.requested_id) == user.id)
+        )
+    )
+    session.exec(
+        delete(CompletedRequest).where(
+            (col(CompletedRequest.requester_id) == user.id)
+            | (col(CompletedRequest.requested_id) == user.id)
+        )
+    )
+    session.delete(user)
+    session.commit()
+
+
+# NOTE: declared before "/{user_id}" so "preview" isn't captured as a user id.
+@router.get("/preview")
+def preview_users(session: SessionDep, limit: int = 12) -> Any:
+    """Public landing-page teaser: a few visible, completed alumni profiles.
+    No auth, and contact details (email/LinkedIn) are intentionally omitted."""
+    users = session.exec(
+        select(User)
+        .where(User.profile_visible == True, User.profile_completed == True)  # noqa: E712
+        .order_by(col(User.graduation_year).desc())
+        .limit(min(limit, 24))
+    ).all()
+    return [
+        {
+            "id": u.id,
+            "full_name": u.full_name,
+            "current_role": u.current_role,
+            "current_company": u.current_company,
+            "graduation_year": u.graduation_year,
+            "location": u.location,
+            "profile_image": u.profile_image,
+            "open_to_coffee_chats": u.open_to_coffee_chats,
+            "open_to_mentorship": u.open_to_mentorship,
+            "available_for_referrals": u.available_for_referrals,
+            "open_to_resume_review": u.open_to_resume_review,
+        }
+        for u in users
+    ]
+
 
 @router.get(
     "/",
@@ -140,8 +196,7 @@ def delete_user_me(session: SessionDep, current_user: CurrentUser) -> Any:
         raise HTTPException(
             status_code=403, detail="Super users are not allowed to delete themselves"
         )
-    session.delete(current_user)
-    session.commit()
+    _delete_user_and_dependents(session, current_user)
     return Message(message="User deleted successfully")
 
 
@@ -236,8 +291,7 @@ def delete_user(
         raise HTTPException(
             status_code=403, detail="Super users are not allowed to delete themselves"
         )
-    session.delete(user)
-    session.commit()
+    _delete_user_and_dependents(session, user)
     return Message(message="User deleted successfully")
 
 

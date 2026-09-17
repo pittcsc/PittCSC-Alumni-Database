@@ -1,5 +1,4 @@
 import axios, { AxiosInstance, AxiosError } from 'axios';
-import { UserUpdate, Interview, Employment, ConnectionRequest } from '../types';
 
 // API base URL - should match your FastAPI backend
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
@@ -55,7 +54,9 @@ export const authAPI = {
     });
     
     accessToken = response.data.access_token;
-    localStorage.setItem('access_token', accessToken);
+    if (accessToken) {
+      localStorage.setItem('access_token', accessToken);
+    }
     return response.data;
   },
 
@@ -65,6 +66,19 @@ export const authAPI = {
       password,
       full_name: fullName,
     });
+    return response.data;
+  },
+
+  // Passwordless email OTP
+  async requestOtp(email: string): Promise<{ message: string; dev_code?: string | null }> {
+    const response = await api.post('/login/otp/request', { email });
+    return response.data;
+  },
+
+  async verifyOtp(email: string, code: string) {
+    const response = await api.post('/login/otp/verify', { email, code });
+    accessToken = response.data.access_token;
+    if (accessToken) localStorage.setItem('access_token', accessToken);
     return response.data;
   },
 
@@ -78,7 +92,7 @@ export const authAPI = {
     return response.data;
   },
 
-  async updateProfile(data: UserUpdate) {
+  async updateProfile(data: any) {
     const response = await api.patch('/users/me', data);
     return response.data;
   },
@@ -96,6 +110,12 @@ export const userAPI = {
     return response.data;
   },
 
+  // Public landing-page teaser (no auth required)
+  async getPreview(limit = 12) {
+    const response = await api.get('/users/preview', { params: { limit } });
+    return response.data;
+  },
+
   async getUserById(userId: number) {
     const response = await api.get(`/users/${userId}`);
     return response.data;
@@ -106,7 +126,7 @@ export const userAPI = {
     return response.data;
   },
 
-  async updateUser(userId: number, data: UserUpdate) {
+  async updateUser(userId: number, data: any) {
     const response = await api.patch(`/users/${userId}`, data);
     return response.data;
   },
@@ -194,12 +214,12 @@ export const interviewAPI = {
     return response.data;
   },
 
-  async createInterview(data: Omit<Interview, 'id'>) {
+  async createInterview(data: any) {
     const response = await api.post('/interviews/', data);
     return response.data;
   },
 
-  async createBulkInterviews(data: Omit<Interview, 'id'>[]) {
+  async createBulkInterviews(data: any[]) {
     const response = await api.post('/interviews/bulk', data);
     return response.data;
   },
@@ -217,7 +237,7 @@ export const employmentAPI = {
     return response.data;
   },
 
-  async createEmployment(data: Omit<Employment, 'id'>) {
+  async createEmployment(data: any) {
     const response = await api.post('/employment/', data);
     return response.data;
   },
@@ -235,12 +255,12 @@ export const requestAPI = {
     return response.data;
   },
 
-  async createRequest(data: Omit<ConnectionRequest, 'id' | 'created_at' | 'updated_at'>) {
+  async createRequest(data: any) {
     const response = await api.post('/requests/', data);
     return response.data;
   },
 
-  async updateRequest(requestId: number, data: Partial<ConnectionRequest>) {
+  async updateRequest(requestId: number, data: any) {
     const response = await api.patch(`/requests/${requestId}`, data);
     return response.data;
   },

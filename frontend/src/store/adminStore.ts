@@ -1,34 +1,30 @@
 import { create } from 'zustand';
 import { userAPI } from '../services/api';
+import { User, PaginatedResponse } from '../types';
+
+interface AdminAnalytics {
+  totalUsers: number;
+  totalAlumni: number;
+  visibleProfiles: number;
+}
 
 interface AdminState {
-  users: any[];
-  pendingAlumni: any[];
-  analytics: {
-    totalUsers: number;
-    totalAlumni: number;
-    totalConnections: number;
-    acceptanceRate: number;
-  };
+  users: User[];
+  analytics: AdminAnalytics;
   isLoading: boolean;
   error: string | null;
   fetchUsers: () => Promise<void>;
-  fetchPendingAlumni: () => Promise<void>;
-  fetchAnalytics: () => Promise<void>;
-  approveAlumni: (userId: number) => Promise<void>;
-  rejectAlumni: (userId: number) => Promise<void>;
-  updateUserRole: (userId: number, isAdmin: boolean) => Promise<void>;
+  deleteUser: (userId: number) => Promise<void>;
+  updateUser: (userId: number, data: Partial<User>) => Promise<void>;
   clearError: () => void;
 }
 
 export const useAdminStore = create<AdminState>((set, get) => ({
   users: [],
-  pendingAlumni: [],
   analytics: {
     totalUsers: 0,
     totalAlumni: 0,
-    totalConnections: 0,
-    acceptanceRate: 0,
+    visibleProfiles: 0,
   },
   isLoading: false,
   error: null,
@@ -37,106 +33,51 @@ export const useAdminStore = create<AdminState>((set, get) => ({
     try {
       set({ isLoading: true, error: null });
 
-      const response = await userAPI.getUsers();
-      set({ users: response.data || [] });
-    } catch (error: any) {
-      set({ error: error.response?.data?.detail || error.message });
-    } finally {
-      set({ isLoading: false });
-    }
-  },
-
-  fetchPendingAlumni: async () => {
-    try {
-      set({ isLoading: true, error: null });
-
-      // Fetch users who have requested alumni status but haven't been approved
-      const response = await userAPI.getUsers();
-      const pendingAlumni = response.data?.filter(
-        (user: any) => !user.is_alumni && user.profile_completed
-      ) || [];
-
-      set({ pendingAlumni });
-    } catch (error: any) {
-      set({ error: error.response?.data?.detail || error.message });
-    } finally {
-      set({ isLoading: false });
-    }
-  },
-
-  fetchAnalytics: async () => {
-    try {
-      set({ isLoading: true, error: null });
-
-      // Get all users
-      const usersResponse = await userAPI.getUsers();
-      const users = usersResponse.data || [];
-
-      // Calculate analytics
-      const totalUsers = users.length;
-      const totalAlumni = users.filter((u: any) => u.is_alumni).length;
-
-      // Note: Connection counts would need proper API endpoints
-      // For now, setting to 0 as a placeholder
-      const totalConnections = 0;
-      const acceptanceRate = 0;
+      const response: PaginatedResponse<User> = await userAPI.getUsers(0, 200);
+      const users = response.data || [];
 
       set({
+        users,
         analytics: {
-          totalUsers,
-          totalAlumni,
-          totalConnections,
-          acceptanceRate,
+          totalUsers: response.count ?? users.length,
+          totalAlumni: users.filter((u) => u.is_alumni).length,
+          visibleProfiles: users.filter((u) => u.profile_visible).length,
         },
       });
     } catch (error: any) {
-      set({ error: error.response?.data?.detail || error.message });
+      set({ error: error.response?.data?.detail || error.message || 'Failed to fetch users' });
     } finally {
       set({ isLoading: false });
     }
   },
 
-  approveAlumni: async (userId: number) => {
+  deleteUser: async (userId: number) => {
     try {
       set({ isLoading: true, error: null });
 
-      await userAPI.updateUser(userId, { is_alumni: true });
+      await userAPI.deleteUser(userId);
 
-      // Refresh pending alumni list
-      await get().fetchPendingAlumni();
-    } catch (error: any) {
-      set({ error: error.response?.data?.detail || error.message });
-    } finally {
-      set({ isLoading: false });
-    }
-  },
-
-  rejectAlumni: async (userId: number) => {
-    try {
-      set({ isLoading: true, error: null });
-
-      // We don't delete the user, just keep them as a non-alumni
-      // This could be enhanced with a "rejected" status if needed
-
-      // Refresh pending alumni list
-      await get().fetchPendingAlumni();
-    } catch (error: any) {
-      set({ error: error.response?.data?.detail || error.message });
-    } finally {
-      set({ isLoading: false });
-    }
-  },
-
-  updateUserRole: async (userId: number, isAdmin: boolean) => {
-    try {
-      set({ isLoading: true, error: null });
-
-      await userAPI.updateUser(userId, { is_superuser: isAdmin });
-
-      // Refresh users list
+      // Refresh users list after deletion
       await get().fetchUsers();
     } catch (error: any) {
-      set({ error: error.response?.data?.detail || error.message });
+      set({ error: error.response?.data?.detail || error.message || 'Failed to delete user' });
+      throw error;
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
+  updateUser: async (userId: number, data: Partial<User>) => {
+    try {
+      set({ isLoading: true, error: null });
+
+      await userAPI.updateUser(userId, data);
+
+      // Refresh users list after update
+      await get().fetchUsers();
+    } catch (error: any) {
+      set({ error: error.response?.data?.detail || error.message || 'Failed to update user' });
+      throw error;
     } finally {
       set({ isLoading: false });
     }

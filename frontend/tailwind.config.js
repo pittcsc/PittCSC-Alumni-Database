@@ -4,17 +4,23 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Primary Pitt Colors
-        pittNavy: '#003594',
-        pittDeepNavy: '#1e3a8a',
-        pittDarkNavy: '#13284B',
+        // Pitt CSC brand blue (#1d2758 = printer-gamut version, used on the logo,
+        // slides and pittcs.wiki). We standardize on this single blue and retire
+        // the screen-only #00205b / Pitt-official #003594.
+        pittNavy: '#1d2758',
+        pittDeepNavy: '#1d2758',
+        pittDarkNavy: '#141a3d', // slightly darker shade for hovers/depth
         pittGold: '#FFB81C',
         pittLightGold: '#FFCC4D',
         pittDarkGold: '#E6A519',
-        
-        // Secondary Colors
-        pittBeige: '#F6D7B0',
-        pittLight: '#EAE6DA',
+
+        // CSC blue alias (preferred name going forward; same value as pittNavy)
+        cscBlue: '#1d2758',
+        cscBlueDark: '#141a3d',
+
+        // Secondary / neutral surfaces — cool light neutrals to match pittcs.wiki
+        pittBeige: '#eef1f6',
+        pittLight: '#f6f7f9',
         pittGray: {
           50: '#f9fafb',
           100: '#f3f4f6',
@@ -78,11 +84,11 @@ export default {
         'medium': '0 4px 16px rgba(0, 0, 0, 0.12)',
         'large': '0 8px 32px rgba(0, 0, 0, 0.16)',
         'glow-gold': '0 0 20px rgba(255, 184, 28, 0.3)',
-        'glow-navy': '0 0 20px rgba(0, 53, 148, 0.3)',
+        'glow-navy': '0 0 20px rgba(29, 39, 88, 0.3)',
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-        'gradient-pitt': 'linear-gradient(135deg, #003594 0%, #1e3a8a 100%)',
+        'gradient-pitt': 'linear-gradient(135deg, #1d2758 0%, #2a3670 100%)',
         'gradient-gold': 'linear-gradient(135deg, #FFB81C 0%, #E6A519 100%)',
       },
     },
