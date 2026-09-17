@@ -9,10 +9,10 @@ import {
   Coffee,
   Users,
   Share2,
+  FileText,
   ChevronDown
 } from 'lucide-react';
 import { AlumniFilters as FiltersType } from '../../types';
-import Button from '../ui/Button';
 
 interface AlumniFiltersProps {
   filters: FiltersType;
@@ -117,7 +117,16 @@ const AlumniFilters: React.FC<AlumniFiltersProps> = ({
             localFilters.available_for_referrals === true ? undefined : true
           )}
         />
-        
+        <FilterChip
+          icon={<FileText className="h-4 w-4" />}
+          label="Resume Review"
+          active={localFilters.open_to_resume_review === true}
+          onClick={() => handleFilterChange(
+            'open_to_resume_review',
+            localFilters.open_to_resume_review === true ? undefined : true
+          )}
+        />
+
         <button
           onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
           className="inline-flex items-center px-4 py-2 rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors"

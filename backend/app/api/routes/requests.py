@@ -157,6 +157,35 @@ async def ignore_request(
     session.commit()
     return {"detail": "Connection request ignored successfully."}
 
+@router.get("/pending/incoming")
+async def incoming_pending_requests(
+    session: SessionDep,
+    current_user: CurrentUser,
+) -> Any:
+    """List connection requests sent TO the current user that are still pending
+    (not yet accepted or ignored), enriched with the requester's basic info."""
+    requests = session.exec(
+        select(Request).where(Request.requested_id == current_user.id)
+    ).all()
+
+    results = []
+    for req in requests:
+        requester = session.get(User, req.requester_id)
+        results.append(
+            {
+                "request_id": req.id,
+                "created_at": req.created_at,
+                "message": req.message,
+                "requester_id": req.requester_id,
+                "requester_name": requester.full_name if requester else None,
+                "requester_email": requester.email if requester else None,
+                "requester_company": requester.current_company if requester else None,
+                "requester_role": requester.current_role if requester else None,
+            }
+        )
+    return results
+
+
 @router.get("/{user_id}/accepted_requests")
 async def accepted_requests(
     user_id: int,

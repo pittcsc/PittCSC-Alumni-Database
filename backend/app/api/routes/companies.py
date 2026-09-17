@@ -68,7 +68,7 @@ def read_company(
     name: str, session: SessionDep, current_user: CurrentUser
 ):
     """
-    retrieves people who interned at company
+    retrieves a single company by name
     """
     db_company = session.get(Company, name)
     if not db_company:
@@ -87,22 +87,20 @@ def create_company(
     Create new company.
     """
 
-    # try catch ValidationError??
     try:
         company = Company.model_validate(company_in)
     except ValidationError as e:
             raise HTTPException(
                 status_code=400,
-                detail=f"Validation error for interview data: {e.errors()}"
+                detail=f"Validation error for company data: {e.errors()}"
             )
 
-    
     statement = select(Company).where(Company.name == company.name)
     old_company = session.exec(statement).first()
     if old_company:
         raise HTTPException(
             status_code=400,
-            detail="The user with this email already exists in the system.",
+            detail="A company with this name already exists in the system.",
         )
 
     session.add(company)
@@ -115,7 +113,7 @@ def read_employees(
     name: str, session: SessionDep, current_user: CurrentUser, skip: int = 0, limit: int = 100
 ):
     """
-    retrieves people who interned at company
+    retrieves everyone who has worked at the company (via employment history)
     """
     users_statement = (
             select(Employment.user_id)
@@ -123,13 +121,12 @@ def read_employees(
             .where(Employment.company_name == name)
         )
     user_ids = session.exec(users_statement).all()
-    # count = len(user_ids)
 
     statement = select(User).select_from(User).where(
         User.id.in_(user_ids)).offset(skip).limit(limit)
     users = session.exec(statement).all()
 
-    return UsersPublic(data=users, count=0)
+    return UsersPublic(data=users, count=len(users))
 
 @router.get("/current_employees/{name}", response_model=UsersPublic)
 def read_current_employees(

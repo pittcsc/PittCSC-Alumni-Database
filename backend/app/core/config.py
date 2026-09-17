@@ -1,6 +1,5 @@
 import secrets
 import warnings
-import os
 from dotenv import load_dotenv
 from typing import Annotated, Any, Literal
 
@@ -53,12 +52,38 @@ class Settings(BaseSettings):
 
     PROJECT_NAME: str = "Pitt CSC DB"
     SENTRY_DSN: HttpUrl | None = None
+
+    # Database configuration.
+    # Set POSTGRES_SERVER (localhost for dev, "database" in docker-compose) to use
+    # Postgres. If it is unset, the app falls back to a local SQLite file so it can
+    # run with zero configuration for development/testing.
+    POSTGRES_SERVER: str | None = None
+    POSTGRES_PORT: int = 5432
+    POSTGRES_USER: str | None = None
+    POSTGRES_PASSWORD: str | None = None
+    POSTGRES_DB: str | None = None
     SQLITE_DB: str = "sqlite:///./alumni.db"
 
     @computed_field  # type: ignore[prop-decorator]
     @property
+    def use_sqlite(self) -> bool:
+        return not self.POSTGRES_SERVER
+
+    @computed_field  # type: ignore[prop-decorator]
+    @property
     def SQLALCHEMY_DATABASE_URI(self) -> str:
-        return self.SQLITE_DB
+        if self.use_sqlite:
+            return self.SQLITE_DB
+        return str(
+            MultiHostUrl.build(
+                scheme="postgresql+psycopg2",
+                username=self.POSTGRES_USER,
+                password=self.POSTGRES_PASSWORD,
+                host=self.POSTGRES_SERVER,
+                port=self.POSTGRES_PORT,
+                path=self.POSTGRES_DB,
+            )
+        )
 
     SMTP_TLS: bool = True
     SMTP_SSL: bool = False
@@ -66,8 +91,8 @@ class Settings(BaseSettings):
     SMTP_HOST: str | None = None
     SMTP_USER: str | None = None
     SMTP_PASSWORD: str | None = None
-    EMAILS_FROM_EMAIL: EmailStr | None = os.getenv('EMAILS_FROM_EMAIL')
-    EMAILS_FROM_NAME: EmailStr | None = None
+    EMAILS_FROM_EMAIL: EmailStr | None = None
+    EMAILS_FROM_NAME: str | None = None
 
     @model_validator(mode="after")
     def _set_default_emails_from(self) -> Self:
@@ -83,9 +108,11 @@ class Settings(BaseSettings):
         return bool(self.SMTP_HOST and self.EMAILS_FROM_EMAIL)
 
     EMAIL_TEST_USER: EmailStr = "test@example.com"
-    FIRST_SUPERUSER: EmailStr = os.getenv('FIRST_SUPERUSER')
-    FIRST_SUPERUSER_PASSWORD: str = os.getenv('FIRST_SUPERUSER_PASSWORD')
-    FIRST_SUPERUSER_NAME: str = os.getenv('FIRST_SUPERUSER_NAME')
+    # Defaults so the app boots without a fully-populated .env; override in
+    # deployment. pydantic-settings reads matching keys from the environment/.env.
+    FIRST_SUPERUSER: EmailStr = "admin@example.com"
+    FIRST_SUPERUSER_PASSWORD: str = "changethis"
+    FIRST_SUPERUSER_NAME: str = "Admin"
 
     def _check_default_secret(self, var_name: str, value: str | None) -> None:
         if value == "changethis":

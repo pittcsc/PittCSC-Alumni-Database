@@ -54,7 +54,9 @@ export const authAPI = {
     });
     
     accessToken = response.data.access_token;
-    localStorage.setItem('access_token', accessToken);
+    if (accessToken) {
+      localStorage.setItem('access_token', accessToken);
+    }
     return response.data;
   },
 
